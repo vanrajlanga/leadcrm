@@ -1,0 +1,36 @@
+/* Left Image Section */
+.bg-image {
+    background: url('https://via.placeholder.com/600') no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+    position: relative;
+}
+
+.overlay-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+}
+
+.overlay-content h1 {
+    font-size: 64px;
+    font-weight: bold;
+}
+
+.overlay-content p {
+    font-size: 24px;
+}
+
+/* Login Form Section */
+.login-form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+@media (max-width: 767px) {
+    .overlay-content {
+        font-size: 16px;
+    }
+}
