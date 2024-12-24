@@ -7,7 +7,7 @@ const LoginPage = () => {
         <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
             <div className="row w-100">
                 {/* Left Image Section */}
-                <div className="col-md-6 d-none d-md-block bg-image">
+                <div className="col-md-6 d-md-block bg-image">
                     <div className="text-center text-white overlay-content">
                         <h1>CRM</h1>
                         <p>Company Name</p>
