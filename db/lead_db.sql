@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 24, 2024 at 02:44 PM
+-- Generation Time: Dec 25, 2024 at 03:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -180,6 +180,16 @@ CREATE TABLE `roles` (
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `permissions`, `createdAt`, `updatedAt`) VALUES
+(1, 'Super Admin', NULL, '2024-12-25 08:53:43', '2024-12-25 08:53:43'),
+(2, 'Admin', NULL, '2024-12-25 08:53:43', '2024-12-25 08:53:43'),
+(3, 'Sales Team', NULL, '2024-12-25 08:53:43', '2024-12-25 08:53:43'),
+(4, 'Customer Support', NULL, '2024-12-25 08:53:43', '2024-12-25 08:53:43');
+
 -- --------------------------------------------------------
 
 --
@@ -238,6 +248,16 @@ CREATE TABLE `users` (
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `email`, `password_hash`, `role_id`, `createdAt`, `updatedAt`) VALUES
+(1, 'superadmin@example.com', '$2b$10$akSUPo4Z8pAfdCUXC1wK2eb2Hn7Gdnx8N7QC9FtFw6d6IiMvZcKyS', 1, '2024-12-25 08:53:44', '2024-12-25 08:53:44'),
+(2, 'admin@example.com', '$2b$10$upSx/BYxCy88VUBNqnEscedv8cOjeYCZxqthpNah/tEllk2gtiIPC', 2, '2024-12-25 08:53:44', '2024-12-25 08:53:44'),
+(3, 'sales@example.com', '$2b$10$oTXxgEhqxI1HOZBRxIrbIeZKoCZN1kY/Lrzje7Gu97jFsQg87kd6S', 3, '2024-12-25 08:53:44', '2024-12-25 08:53:44'),
+(4, 'support@example.com', '$2b$10$mEVV/6QZLWygvOaEecTTXusLvCwV6bDrPho2ZBT0V3jTIMTDmvaFK', 4, '2024-12-25 08:53:44', '2024-12-25 08:53:44');
 
 --
 -- Indexes for dumped tables
@@ -307,7 +327,10 @@ ALTER TABLE `quotes`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `name_2` (`name`),
+  ADD UNIQUE KEY `name_3` (`name`),
+  ADD UNIQUE KEY `name_4` (`name`);
 
 --
 -- Indexes for table `sessions`
@@ -334,7 +357,11 @@ ALTER TABLE `templates`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `email_2` (`email`),
+  ADD UNIQUE KEY `email_3` (`email`),
+  ADD UNIQUE KEY `email_4` (`email`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -398,7 +425,7 @@ ALTER TABLE `quotes`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `sessions`
@@ -422,7 +449,7 @@ ALTER TABLE `templates`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -432,7 +459,15 @@ ALTER TABLE `users`
 -- Constraints for table `leads`
 --
 ALTER TABLE `leads`
-  ADD CONSTRAINT `leads_ibfk_1` FOREIGN KEY (`assigned_agent_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `leads_ibfk_1` FOREIGN KEY (`assigned_agent_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `leads_ibfk_2` FOREIGN KEY (`assigned_agent_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `leads_ibfk_3` FOREIGN KEY (`assigned_agent_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
