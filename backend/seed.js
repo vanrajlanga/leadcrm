@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
         await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true });
 
         // Sync database and force drop all tables
-        await sequelize.sync({ force: true });
+        await sequelize.sync({ alter: true });
 
         // Enable foreign key checks
         await sequelize.query('SET FOREIGN_KEY_CHECKS = 1', { raw: true });

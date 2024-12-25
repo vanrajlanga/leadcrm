@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
 });
 
 // Sync database and start server
-sequelize.sync({ force: true })
+sequelize.sync({ alter: true })
     .then(() => {
         console.log('Database synchronized');
         const PORT = process.env.PORT || 5000;

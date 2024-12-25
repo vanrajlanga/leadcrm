@@ -1,34 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import { FaUser } from 'react-icons/fa';
 import { login } from '../api/auth';
-import { fetchRoles } from '../api/roles';
 
-const LoginPage = ({ onLogin }) => {
+const LoginPage = ({ roles, onLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('');
-    const [roles, setRoles] = useState([]);
     const [error, setError] = useState('');
-
-    // Fetch roles on component mount
-    useEffect(() => {
-        const getRoles = async () => {
-            try {
-                const data = await fetchRoles();
-                setRoles(data);
-            } catch (err) {
-                console.error('Error fetching roles:', err);
-            }
-        };
-        getRoles();
-    }, []);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { token, role_id } = await login(email, password, role);
-            onLogin(token, role_id); // Pass token and role to the parent
+            const response = await login(email, password, role);
+            const { token, role_id } = response;
+            onLogin(token, role_id, email); // Pass token, role_id, and email to parent
+            navigate('/dashboard'); // Redirect to dashboard
         } catch (err) {
             setError('Invalid email, password, or role');
         }
@@ -37,7 +26,6 @@ const LoginPage = ({ onLogin }) => {
     return (
         <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
             <div className="row w-100">
-                {/* Left Image Section */}
                 <div className="col-md-6 d-none d-md-block bg-image">
                     <div className="text-center text-white overlay-content">
                         <h1>CRM</h1>
@@ -45,7 +33,6 @@ const LoginPage = ({ onLogin }) => {
                     </div>
                 </div>
 
-                {/* Right Login Form Section */}
                 <div className="col-md-6 d-flex flex-column justify-content-center align-items-center">
                     <div className="login-form-container">
                         <h2 className="text-center">Login</h2>
@@ -84,9 +71,9 @@ const LoginPage = ({ onLogin }) => {
                                     onChange={(e) => setRole(e.target.value)}
                                     required
                                 >
-                                    <option value="">Login As</option>
+                                    <option value="">Select Role</option>
                                     {roles.map((role) => (
-                                        <option key={role.id} value={role.name}>
+                                        <option key={role.id} value={role.id}>
                                             {role.name}
                                         </option>
                                     ))}

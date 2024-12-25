@@ -1,13 +1,15 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'http://localhost:5000/api/users/login';
 
-// Login API call
 export const login = async (email, password, role) => {
-    const response = await axios.post(`${API_URL}/login`, {
+    const response = await axios.post(API_URL, {
         email,
         password,
         role,
     });
-    return response.data; // Expects token and user info
+
+    // Ensure the correct structure is returned
+    const { token, role_id, email: userEmail } = response.data;
+    return { token, role_id, email: userEmail };
 };
