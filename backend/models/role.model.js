@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
+const User = require("./user.model"); // Import User model
 
 const Role = sequelize.define(
 	"Role",
@@ -23,5 +24,14 @@ const Role = sequelize.define(
 		updatedAt: "updatedAt",
 	}
 );
+
+// Define associations
+Role.associate = (models) => {
+	Role.belongsToMany(models.User, {
+		through: "UserRoles",
+		as: "users", // Alias for users
+		foreignKey: "role_id",
+	});
+};
 
 module.exports = Role;

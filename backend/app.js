@@ -1,8 +1,19 @@
 const express = require("express");
 const { sequelize } = require("./models");
 const authRoutes = require("./routes/auth.routes");
+const roleRoutes = require("./routes/role.routes");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
+
+app.use(
+	cors({
+		origin: process.env.FRONTEND_URL || "*", // Replace with your frontend URL
+		methods: ["GET", "POST", "PUT", "DELETE"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	})
+);
 
 // Middleware
 app.use(express.json()); // Parse JSON request bodies
@@ -15,6 +26,7 @@ sequelize
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/roles", roleRoutes);
 
 const protectedRoutes = require("./routes/protected.routes");
 app.use("/api/protected", protectedRoutes);

@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Role = require("./role.model"); // Import Role model
 
 const User = sequelize.define(
 	"User",
@@ -49,6 +50,15 @@ User.prototype.generateAuthToken = function () {
 		{ expiresIn: "1h" }
 	);
 	return token;
+};
+
+// Define associations
+User.associate = (models) => {
+	User.belongsToMany(models.Role, {
+		through: "UserRoles",
+		as: "roles", // Alias for roles
+		foreignKey: "user_id",
+	});
 };
 
 module.exports = User;

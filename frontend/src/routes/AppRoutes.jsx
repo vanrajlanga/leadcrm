@@ -1,71 +1,66 @@
 import React from "react";
-import {
-	BrowserRouter as Router,
-	Routes,
-	Route,
-	Navigate,
-} from "react-router-dom";
-import LoginPage from "../pages/LoginPage";
-import DashboardPage from "../pages/DashboardPage";
-import NotFoundPage from "../pages/NotFoundPage";
-import MainLayout from "../layouts/MainLayout";
-import { hasRole } from "../utils/auth";
-
-const ProtectedRoute = ({ children, requiredRoles }) => {
-	const token = localStorage.getItem("token");
-
-	if (!token) {
-		// Redirect to /login if no token
-		return <Navigate to="/login" replace />;
-	}
-
-	const roles = JSON.parse(localStorage.getItem("roles")) || [];
-	if (requiredRoles && !roles.some((role) => requiredRoles.includes(role))) {
-		// Redirect to /login if roles don't match
-		return <Navigate to="/login" replace />;
-	}
-
-	return children;
-};
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AuthLayout from "../layouts/AuthLayout/AuthLayout";
+import MainLayout from "../layouts/MainLayout/MainLayout";
+import Login from "../pages/Login/Login";
+import Dashboard from "../pages/Dashboard/Dashboard";
+import Leads from "../pages/Leads/Leads";
 
 const AppRoutes = () => {
-	const token = localStorage.getItem("token");
+	const isAuthenticated = !!localStorage.getItem("token"); // Check if user is logged in
 
 	return (
 		<Router>
 			<Routes>
-				{/* Root Route: Redirect to /login or /dashboard */}
-				<Route
-					path="/"
-					element={
-						token ? (
-							<Navigate to="/dashboard" replace />
-						) : (
-							<Navigate to="/login" replace />
-						)
-					}
-				/>
-
-				{/* Auth Route */}
-				<Route
-					path="/login"
-					element={token ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-				/>
+				{/* Authentication Routes */}
+				{!isAuthenticated && (
+					<Route
+						path="/"
+						element={
+							<AuthLayout>
+								<Login />
+							</AuthLayout>
+						}
+					/>
+				)}
 
 				{/* Protected Routes */}
-				<Route element={<MainLayout />}>
+				{isAuthenticated && (
 					<Route
 						path="/dashboard"
 						element={
-							<ProtectedRoute requiredRoles={["Admin", "Super Admin"]}>
-								<DashboardPage />
-							</ProtectedRoute>
+							<MainLayout>
+								<Dashboard />
+							</MainLayout>
 						}
 					/>
-				</Route>
+				)}
+				{isAuthenticated && (
+					<Route
+						path="/leads"
+						element={
+							<MainLayout>
+								<Leads />
+							</MainLayout>
+						}
+					/>
+				)}
 
-				{/* Catch-All Route */}
-				<Route path="*" element={<NotFoundPage />} />
+				{/* Redirect for unmatched routes */}
+				<Route
+					path="*"
+					element={
+						isAuthenticated ? (
+							<MainLayout>
+								<Dashboard />
+							</MainLayout>
+						) : (
+							<AuthLayout>
+								<Login />
+							</AuthLayout>
+						)
+					}
+				/>
 			</Routes>
 		</Router>
 	);

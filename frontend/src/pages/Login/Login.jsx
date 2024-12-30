@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./LoginPage.css";
+import "./Login.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const LoginPage = () => {
+const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [role, setRole] = useState(""); // Track selected role
+	const [roles, setRoles] = useState([]); // Dynamic roles from API
 	const [message, setMessage] = useState("");
 
+	// Fetch roles from API
 	useEffect(() => {
-		const token = localStorage.getItem("token");
-		if (token) {
-			window.location.href = "/dashboard";
-		}
+		const fetchRoles = async () => {
+			try {
+				const response = await axios.get(`${API_URL}/roles`);
+				setRoles(response.data);
+				if (response.data.length > 0) {
+					setRole(response.data[0].name); // Default to the first role
+				}
+			} catch (error) {
+				console.error("Error fetching roles:", error);
+			}
+		};
+
+		fetchRoles();
 	}, []);
 
 	const handleSubmit = async (e) => {
@@ -22,12 +34,13 @@ const LoginPage = () => {
 			const response = await axios.post(`${API_URL}/auth/login`, {
 				email,
 				password,
+				role, // Pass the selected role to the backend
 			});
 
-			localStorage.setItem("token", response.data.token); // Save token
-			localStorage.setItem("roles", JSON.stringify(response.data.user.roles)); // Save roles
+			localStorage.setItem("token", response.data.token);
+			localStorage.setItem("roles", JSON.stringify(response.data.user.roles));
 
-			window.location.href = "/dashboard"; // Redirect to dashboard
+			window.location.href = "/dashboard";
 		} catch (error) {
 			setMessage(error.response?.data?.message || "Login Failed");
 		}
@@ -78,11 +91,17 @@ const LoginPage = () => {
 					</div>
 					<div className="mb-3">
 						<label className="form-label">Login As</label>
-						<select className="form-select">
-							<option value="Admin">Admin</option>
-							<option value="Super Admin">Super Admin</option>
-							<option value="Sales Team">Sales Team</option>
-							<option value="Customer Support">Customer Support</option>
+						<select
+							className="form-select"
+							value={role}
+							onChange={(e) => setRole(e.target.value)}
+							required
+						>
+							{roles.map((r) => (
+								<option key={r.id} value={r.name}>
+									{r.name}
+								</option>
+							))}
 						</select>
 					</div>
 					<div className="mb-3 form-check">
@@ -111,4 +130,4 @@ const LoginPage = () => {
 	);
 };
 
-export default LoginPage;
+export default Login;
