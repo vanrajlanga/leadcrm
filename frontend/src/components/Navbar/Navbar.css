@@ -1,38 +1,75 @@
-.navbar {
-	background-color: #ffffff;
-	border-bottom: 1px solid #ddd;
-	padding: 10px 20px !important;
-	display: flex !important;
-	justify-content: center !important;
+/* Secondary Navigation */
+.secondary-nav {
+    background-color: #f8f9fa;
+    padding: 1rem 20px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ensures the two sections stay apart */
+    width: 100%;
 }
 
-.navbar-menu {
-	display: flex;
-	gap: 20px;
-	list-style: none;
-	padding: 0;
-	margin: 0;
+/* Left Section: Navigation Items */
+.secondary-nav-list-wrapper {
+    flex: 0 0 85%; /* Only take as much space as the content */
+    margin-left: 20px; /* Add 20px space on the left */
+    margin-right: 60px;
 }
 
-.navbar-menu li {
-	font-size: 1rem;
+.secondary-nav-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Equal spacing between items */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 80%;
 }
 
-.navbar-menu a {
-	text-decoration: none;
-	color: #555;
-	padding: 5px 10px;
-	transition: color 0.3s, background-color 0.3s;
+.secondary-nav-link,
+.active-nav-button {
+    text-decoration: none;
+    color: #808080;
+    font-size: 1rem;
+	font-family: 'Times New Roman', Times, serif;
+    font-weight: 500;
+    text-align: center;
+    flex: 1; /* Equally divide space among items */
 }
 
-.navbar-menu a:hover {
-	color: #000000;
-	background-color: #f0f0f0;
-	border-radius: 4px;
+.secondary-nav-link:hover {
+    color: black;
 }
 
-.active-link {
-	color: #ffffff !important;
-	background-color: #000000;
-	border-radius: 4px;
+.active-nav-button {
+    background-color: black;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.active-nav-button:hover {
+    opacity: 1;
+	color: white;
+}
+
+/* Right Section: Date Filter */
+.secondary-nav-date-wrapper {
+    flex: 0 0 15%; /* Take only as much space as the content */
+    margin-left: auto; /* Push this section to the far right */
+}
+
+.date-filter {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #dcf0f358;
+    font-size: 1rem;
+	font-weight: lighter;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #919090;
+    box-shadow: inset 0 2px 6px rgba(105, 151, 170, 0.363); /* Same inner shadow as the search bar */
 }
