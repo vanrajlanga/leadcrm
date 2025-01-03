@@ -5,6 +5,9 @@ import MainLayout from "../layouts/MainLayout/MainLayout";
 import Login from "../pages/Login/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Leads from "../pages/Leads/Leads";
+import Agents from "../pages/Agents/Agents";
+import Quotations from "../pages/Quotations/Quotations";
+import Tickets from "../pages/Tickets/Tickets";
 
 const AppRoutes = () => {
 	const isAuthenticated = !!localStorage.getItem("token"); // Check if user is logged in
@@ -41,6 +44,39 @@ const AppRoutes = () => {
 						element={
 							<MainLayout>
 								<Leads />
+							</MainLayout>
+						}
+					/>
+				)}
+
+				{isAuthenticated && (
+					<Route
+						path="/add-agents"
+						element={
+							<MainLayout>
+								<Agents />
+							</MainLayout>
+						}
+					/>
+				)}
+
+				{isAuthenticated && (
+					<Route
+						path="/quotations"
+						element={
+							<MainLayout>
+								<Quotations />
+							</MainLayout>
+						}
+					/>
+				)}
+
+				{isAuthenticated && (
+					<Route
+						path="/tickets"
+						element={
+							<MainLayout>
+								<Tickets />
 							</MainLayout>
 						}
 					/>

@@ -58,8 +58,8 @@ const seedRolesAndUsers = async () => {
 		const userRoles = [
 			{ user_id: users[0].id, role_id: roles[0].id }, // John Doe -> Super Admin
 			{ user_id: users[1].id, role_id: roles[1].id }, // Jane Smith -> Admin
-			{ user_id: users[2].id, role_id: roles[2].id }, // Bob Brown -> Sales Team
-			{ user_id: users[3].id, role_id: roles[3].id }, // Alice Johnson -> Customer Support
+			{ user_id: users[2].id, role_id: roles[2].id }, // Bob Brown -> Sales Team (should not be able to see the contact info of the leads) (create permission for that)
+			{ user_id: users[3].id, role_id: roles[3].id }, // Alice Johnson -> Customer Support (should not be able to see the contact info of the leads)
 		];
 
 		await UserRole.bulkCreate(userRoles);
