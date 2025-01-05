@@ -1,0 +1,125 @@
+.table-container {
+    overflow-x: auto; /* Enables horizontal scrolling */
+    width: 100%; /* Ensures the container uses the full width of its parent */
+}
+
+.custom-table {
+    width: 100%; /* Ensures the table stretches to fill the container */
+    border-collapse: collapse;
+    white-space: nowrap; /* Keeps the text in a single line */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px; /* Increased padding for larger cell size */
+    text-align: center; /* Center text horizontally */
+    vertical-align: middle; /* Center text vertically */
+    min-width: 180px; /* Increased minimum width to accommodate larger padding and content */
+    align-content: baseline;
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    background-color: rgba(169, 223, 246, 0.129); /* Cyan header background */
+    color: black; /* Changed from white to black for better visibility */
+    font-weight: 500;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: center !important; /* Center text in the header */
+}
+
+button {
+    padding: 8px 12px; /* Slightly larger buttons */
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+.status-cell { /* Ensure this class is added to your td elements in the React component */
+    height: 100%; /* Take full height of cell */
+}
+.status {
+    padding: 6px 10px; /* Slightly increased horizontal padding */
+    font-size: 15px ; /* Adjusted font size for readability */
+    border-radius: 4px; /* Rounded corners for aesthetic */
+    display: inline-flex; /* Inline flex to keep the flow inline but enable flex properties */
+    align-items: center; /* Center text inside the status box */
+    justify-content: center; /* Ensure the text is centered within the label */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    width: fit-content; /* Adjust width to fit the content */
+    margin: 0 auto; /* Center the label within the flex container if there's extra space */
+    font-family: Quando;
+}
+
+.status.follow-up {
+    background-color: #FFFBDD;
+    color: #FFCC00; /* Dark text for better contrast */
+    min-width: 100px;
+}
+
+.status.converted {
+    background-color: #DAFFDF; /* Light green */
+    color: #3EBA00; /* Dark green for readability */
+    min-width: 100px;
+}
+
+.status.rejected {
+    background-color: #FFE8E8; /* Light red */
+    color: #D90000; /* Dark red for visibility */
+    min-width: 100px;
+}
+
+.view-btn {
+    background-color: black; /* Set background color to black */
+    color: white; /* Set text color to white for contrast */
+    padding: 2px 8px; /* Slightly larger buttons */
+    border: none;
+    cursor: pointer;
+    font-size: 16px; /* Increase the size of the emoji slightly */
+    border-radius: 4px; /* Optional: adds rounded corners to the button */
+}
+
+.view-btn:hover {
+    opacity: 0.8; /* Slight transparency on hover for a subtle effect */
+}
+
+.quotation-btn {
+    background-color: black; /* Set background color to black */
+    color: white; /* Set font color to white for contrast */
+    padding: 3px 12px; /* Adequate padding for button aesthetics */
+    border: none; /* Remove any default border */
+    cursor: pointer; /* Cursor pointer to indicate it's clickable */
+    font-size: 16px; /* Font size for visibility */
+    border-radius: 4px; /* Rounded corners for a smoother look */
+    transition: opacity 0.3s; /* Smooth transition for hover effect */
+    font-family: Kaisei HarunoUmi;
+}
+
+.quotation-btn:hover {
+    opacity: 0.8; /* Slight transparency on hover for a subtle effect */
+}
+
+
+.action-btn {
+    background-color: black; /* Clear background */
+    color: white; /* Black icon color */
+    padding: 6px 8px; /* Adequate padding for button aesthetics */
+    display: inline-flex; /* Use flex to center the icon inside the button */
+    align-items: center; /* Center alignment of icon vertically */
+    justify-content: center; /* Center alignment of icon horizontally */
+    cursor: pointer; /* Cursor to pointer */
+    margin-right: 5px; /* Space between buttons */
+    border-radius: 4px; /* Rounded corners for a smoother look */
+}
+
+.action-btn:hover {
+    background-color: #f0f0f0; /* Light grey background on hover for visual feedback */
+}
