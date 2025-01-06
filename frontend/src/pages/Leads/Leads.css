@@ -48,12 +48,11 @@ button:hover {
 }
 .status {
     padding: 6px 10px; /* Slightly increased horizontal padding */
-    font-size: 15px ; /* Adjusted font size for readability */
+    font-size: 16px ; /* Adjusted font size for readability */
     border-radius: 4px; /* Rounded corners for aesthetic */
     display: inline-flex; /* Inline flex to keep the flow inline but enable flex properties */
     align-items: center; /* Center text inside the status box */
     justify-content: center; /* Ensure the text is centered within the label */
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     width: fit-content; /* Adjust width to fit the content */
     margin: 0 auto; /* Center the label within the flex container if there's extra space */
     font-family: Quando;
