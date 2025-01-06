@@ -62,7 +62,7 @@ const AppRoutes = () => {
 
 				{isAuthenticated && (
 					<Route
-						path="/quotations"
+						path="/quotations-history"
 						element={
 							<MainLayout>
 								<Quotations />
@@ -73,7 +73,7 @@ const AppRoutes = () => {
 
 				{isAuthenticated && (
 					<Route
-						path="/tickets"
+						path="/ticket-history"
 						element={
 							<MainLayout>
 								<Tickets />

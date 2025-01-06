@@ -17,6 +17,14 @@ const Agent = sequelize.define(
 			type: DataTypes.DECIMAL(10, 2),
 			defaultValue: 0.0,
 		},
+		quarterly_target: {
+			type: DataTypes.DECIMAL(10, 2),
+			defaultValue: 0.0,
+		},
+		yearly_target: {
+			type: DataTypes.DECIMAL(10, 2),
+			defaultValue: 0.0,
+		},
 	},
 	{
 		timestamps: true,
