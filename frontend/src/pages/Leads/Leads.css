@@ -120,5 +120,39 @@ button:hover {
 }
 
 .action-btn:hover {
-    background-color: #f0f0f0; /* Light grey background on hover for visual feedback */
+    opacity: 0.8; /* Light grey background on hover for visual feedback */
+}
+
+.phone-btn{
+    background-color: black; /* Clear background */
+    color: white; /* Black icon color */
+    display: inline-flex; /* Use flex to center the icon inside the button */
+    align-items: center; /* Center alignment of icon vertically */
+    justify-content: center; /* Center alignment of icon horizontally */
+    cursor: pointer; /* Cursor to pointer */
+    margin-right: 5px; /* Space between buttons */
+    border-radius: 4px; /* Rounded corners for a smoother look */
+    font-size: 20px; /* Increased font size for text/icon */
+    padding: 2px; /* Space inside the border */
+}
+
+.phone-btn:hover {
+    opacity: 0.8; /* Light grey background on hover for visual feedback */
+}
+
+.email-btn{
+    background-color: black; /* Clear background */
+    color: white; /* Black icon color */
+    display: inline-flex; /* Use flex to center the icon inside the button */
+    align-items: center; /* Center alignment of icon vertically */
+    justify-content: center; /* Center alignment of icon horizontally */
+    cursor: pointer; /* Cursor to pointer */
+    margin-right: 5px; /* Space between buttons */
+    border-radius: 4px; /* Rounded corners for a smoother look */
+    font-size: 20px; /* Increased font size for text/icon */
+    padding: 2px; /* Space inside the border */
+}
+
+.email-btn:hover {
+    opacity: 0.8; /* Light grey background on hover for visual feedback */
 }
