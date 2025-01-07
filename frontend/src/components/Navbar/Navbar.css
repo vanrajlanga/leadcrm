@@ -14,7 +14,7 @@
 .secondary-nav-list-wrapper {
     flex: 0 0 85%; /* Only take as much space as the content */
     margin-left: 20px; /* Add 20px space on the left */
-    margin-right: 60px;
+    margin-right: 45px;
 }
 
 .secondary-nav-list {
@@ -58,11 +58,14 @@
 
 /* Right Section: Date Filter */
 .secondary-nav-date-wrapper {
-    flex: 0 0 15%; /* Take only as much space as the content */
-    margin-left: auto; /* Push this section to the far right */
+	display: flex; /* Enable flexbox layout */
+    justify-content: space-between; /* Space out child elements */
+    flex: 0 0 11%; /* Adjust width as necessary, increase if needed */
+    align-items: center; /* Center items vertically */
+
 }
 
-.date-filter {
+.date-filter,.id-filter,.status-filter {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -72,4 +75,8 @@
 	font-family: Arial, Helvetica, sans-serif;
 	color: #919090;
     box-shadow: inset 0 2px 6px rgba(105, 151, 170, 0.363); /* Same inner shadow as the search bar */
+}
+
+.date-filter:last-child, .id-filter:last-child, .status-filter:last-child {
+    margin-right: 0;
 }

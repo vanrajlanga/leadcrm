@@ -1,7 +1,7 @@
 import React from 'react';
 import './Leads.css';
 import { AiOutlineEye } from 'react-icons/ai';
-import { MdPerson,   } from 'react-icons/md';
+import { MdPerson,MdOutlinePhone, MdOutlineEmail} from 'react-icons/md';
 import {  IoMdCalendar, IoIosMore } from 'react-icons/io';
 
 const Leads = () => {
@@ -50,8 +50,8 @@ const Leads = () => {
                         <tr key={row.id}>
                             <td>{row.id}</td>
                             <td>{row.name}</td>
-                            <td>{row.number}</td>
-                            <td>{row.email}</td>
+                            <td><MdOutlinePhone className="phone-btn"/> {row.number}</td>
+                            <td><MdOutlineEmail className="email-btn"/> {row.email}</td>
                             <td>{row.category}</td>
                             <td>{row.cp}</td>
                             <td>{row.sp}</td>
