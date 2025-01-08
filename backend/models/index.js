@@ -20,74 +20,137 @@ const Template = require("./template.model");
 const Note = require("./note.model");
 const Reminder = require("./reminder.model");
 
+// Associations
+
 // User and Role (Many-to-Many)
 User.belongsToMany(Role, {
 	through: UserRole,
 	as: "roles",
-	foreignKey: "user_id",
+	foreignKey: {
+		name: "user_id",
+		allowNull: false,
+		constraints: false, // Disable auto constraints to avoid redundancy
+	},
 });
 Role.belongsToMany(User, {
 	through: UserRole,
 	as: "users",
-	foreignKey: "role_id",
+	foreignKey: {
+		name: "role_id",
+		allowNull: false,
+		constraints: false,
+	},
 });
 
 // Role and Permission (Many-to-Many)
 Role.belongsToMany(Permission, {
 	through: RolePermission,
-	as: "permissions", // Alias for permissions
-	foreignKey: "role_id",
+	as: "permissions",
+	foreignKey: {
+		name: "role_id",
+		allowNull: false,
+		constraints: false,
+	},
 });
 Permission.belongsToMany(Role, {
 	through: RolePermission,
-	as: "roles", // Alias for roles in permission
-	foreignKey: "permission_id",
+	as: "roles",
+	foreignKey: {
+		name: "permission_id",
+		allowNull: false,
+		constraints: false,
+	},
 });
 
 // User and Agent (One-to-One)
-Agent.belongsTo(User, { as: "user", foreignKey: "user_id" });
-User.hasOne(Agent, { as: "agent", foreignKey: "user_id" });
+Agent.belongsTo(User, {
+	as: "user",
+	foreignKey: {
+		name: "user_id",
+		allowNull: false,
+	},
+});
+User.hasOne(Agent, {
+	as: "agent",
+	foreignKey: {
+		name: "user_id",
+		allowNull: false,
+	},
+});
 
 // Agent and Lead (One-to-Many)
-Lead.belongsTo(Agent, { as: "agent", foreignKey: "agent_id" });
-Agent.hasMany(Lead, { as: "leads", foreignKey: "agent_id" });
+Lead.belongsTo(Agent, {
+	as: "agent",
+	foreignKey: {
+		name: "agent_id",
+		allowNull: false,
+		constraints: false,
+	},
+});
+Agent.hasMany(Lead, {
+	as: "leads",
+	foreignKey: "agent_id",
+});
 
 // Lead and Quote (One-to-Many)
-Quote.belongsTo(Lead, { as: "lead", foreignKey: "lead_id" });
-Lead.hasMany(Quote, { as: "quotes", foreignKey: "lead_id" });
-
-// Agent and Quote (One-to-Many)
-Quote.belongsTo(Agent, { as: "agent", foreignKey: "agent_id" });
-Agent.hasMany(Quote, { as: "quotes", foreignKey: "agent_id" });
+Quote.belongsTo(Lead, {
+	as: "lead",
+	foreignKey: {
+		name: "lead_id",
+		allowNull: false,
+	},
+});
+Lead.hasMany(Quote, {
+	as: "quotes",
+	foreignKey: "lead_id",
+});
 
 // Lead and Sale (One-to-Many)
-Sale.belongsTo(Lead, { as: "lead", foreignKey: "lead_id" });
-Lead.hasMany(Sale, { as: "sales", foreignKey: "lead_id" });
-
-// Agent and Sale (One-to-Many)
-Sale.belongsTo(Agent, { as: "agent", foreignKey: "agent_id" });
-Agent.hasMany(Sale, { as: "sales", foreignKey: "agent_id" });
+Sale.belongsTo(Lead, {
+	as: "lead",
+	foreignKey: {
+		name: "lead_id",
+		allowNull: false,
+	},
+});
+Lead.hasMany(Sale, {
+	as: "sales",
+	foreignKey: "lead_id",
+});
 
 // Lead and Ticket (One-to-Many)
-Ticket.belongsTo(Lead, { as: "lead", foreignKey: "lead_id" });
-Lead.hasMany(Ticket, { as: "tickets", foreignKey: "lead_id" });
-
-// Agent and Ticket (One-to-Many)
-Ticket.belongsTo(Agent, { as: "agent", foreignKey: "agent_id" });
-Agent.hasMany(Ticket, { as: "tickets", foreignKey: "agent_id" });
+Ticket.belongsTo(Lead, {
+	as: "lead",
+	foreignKey: {
+		name: "lead_id",
+		allowNull: false,
+	},
+});
+Lead.hasMany(Ticket, {
+	as: "tickets",
+	foreignKey: "lead_id",
+});
 
 // User and Notification (One-to-Many)
-Notification.belongsTo(User, { as: "user", foreignKey: "user_id" });
-User.hasMany(Notification, { as: "notifications", foreignKey: "user_id" });
-
-// Lead and PaymentHistory (One-to-Many)
-PaymentHistory.belongsTo(Lead, { as: "lead", foreignKey: "lead_id" });
-Lead.hasMany(PaymentHistory, { as: "paymentHistories", foreignKey: "lead_id" });
+Notification.belongsTo(User, {
+	as: "user",
+	foreignKey: {
+		name: "user_id",
+		allowNull: false,
+	},
+});
+User.hasMany(Notification, {
+	as: "notifications",
+	foreignKey: "user_id",
+});
 
 // PaymentGatewayTransaction and PaymentHistory (One-to-Many)
 PaymentHistory.belongsTo(PaymentGatewayTransaction, {
 	as: "transaction",
-	foreignKey: "transaction_id",
+	foreignKey: {
+		name: "transaction_id",
+		allowNull: false,
+	},
 });
 PaymentGatewayTransaction.hasMany(PaymentHistory, {
 	as: "paymentHistories",
@@ -95,26 +158,57 @@ PaymentGatewayTransaction.hasMany(PaymentHistory, {
 });
 
 // User and Session (One-to-Many)
-Session.belongsTo(User, { as: "user", foreignKey: "user_id" });
-User.hasMany(Session, { as: "sessions", foreignKey: "user_id" });
+Session.belongsTo(User, {
+	as: "user",
+	foreignKey: {
+		name: "user_id",
+		allowNull: false,
+	},
+});
+User.hasMany(Session, {
+	as: "sessions",
+	foreignKey: "user_id",
+});
 
 // User and Notes (One-to-Many)
-Note.belongsTo(User, { as: "user", foreignKey: "user_id" });
-User.hasMany(Note, { as: "notes", foreignKey: "user_id" });
+Note.belongsTo(User, {
+	as: "user",
+	foreignKey: {
+		name: "user_id",
+		allowNull: false,
+	},
+});
+User.hasMany(Note, {
+	as: "notes",
+	foreignKey: "user_id",
+});
 
 // Lead and Notes (One-to-Many)
-Note.belongsTo(Lead, { as: "lead", foreignKey: "lead_id" });
-Lead.hasMany(Note, { as: "notes", foreignKey: "lead_id" });
+Note.belongsTo(Lead, {
+	as: "lead",
+	foreignKey: {
+		name: "lead_id",
+		allowNull: false,
+	},
+});
+Lead.hasMany(Note, {
+	as: "notes",
+	foreignKey: "lead_id",
+});
 
-// User and Reminders (One-to-Many)
-Reminder.belongsTo(User, { as: "user", foreignKey: "user_id" });
-User.hasMany(Reminder, { as: "reminders", foreignKey: "user_id" });
-
-// Sync models with database
+// Sync models with the database
 sequelize
-	.sync({ alter: true }) // Adjust the database schema to match the models
-	.then(() => console.log("All models synchronized successfully."))
-	.catch((err) => console.error("Error synchronizing models:", err));
+	.authenticate()
+	.then(() => {
+		console.log("Database connection established successfully.");
+		return sequelize.sync({ force: false }); // Use migrations in production
+	})
+	.then(() => {
+		console.log("All models synchronized successfully.");
+	})
+	.catch((err) => {
+		console.error("Error during model synchronization:", err);
+	});
 
 // Export models and sequelize
 module.exports = {

@@ -75,3 +75,67 @@
 .table tbody tr:hover {
 	background-color: #f9f9f9;
 }
+/* Pagination Container */
+.pagination-container {
+	display: flex;
+	justify-content: flex-end; /* Align to right */
+	align-items: center;
+	padding-right: 10px; /* Add spacing from the right corner */
+}
+
+/* Pagination Items */
+.pagination .page-item {
+	margin: 0 5px;
+}
+
+.custom-pagination-item.active .custom-pagination-link {
+	background-color: #f9f9f9;
+	color: black;
+	border: 1px solid #ccc;
+	font-weight: bold;
+}
+
+.custom-pagination-item .custom-pagination-link {
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1rem;
+	transition: all 0.3s ease;
+	background-color: #fff;
+	color: black;
+}
+
+.custom-pagination-item .custom-pagination-link:hover {
+	background-color: #f0f0f0;
+	color: black;
+	transform: scale(1.1);
+}
+
+.custom-pagination-arrow {
+	border: none;
+	background: none;
+	color: #666;
+	font-size: 1.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.custom-pagination-arrow:hover {
+	color: black;
+}
+
+.page-item.disabled .custom-pagination-arrow {
+	color: #ddd;
+	cursor: not-allowed;
+}
+
+.page-item.disabled .custom-pagination-link {
+	color: #ddd;
+	cursor: not-allowed;
+	pointer-events: none;
+}

@@ -1,7 +1,6 @@
 const express = require("express");
 const { sequelize } = require("./models");
-const authRoutes = require("./routes/auth.routes");
-const roleRoutes = require("./routes/role.routes");
+const routes = require("./routes");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -25,11 +24,7 @@ sequelize
 	.catch((err) => console.error("Database connection failed:", err));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/roles", roleRoutes);
-
-const protectedRoutes = require("./routes/protected.routes");
-app.use("/api/protected", protectedRoutes);
+app.use("/api", routes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;

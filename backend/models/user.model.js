@@ -18,8 +18,12 @@ const User = sequelize.define(
 		},
 		email: {
 			type: DataTypes.STRING,
-			unique: true,
 			allowNull: false,
+			// Use `unique: true` only if the table is being created for the first time
+			unique: {
+				name: "unique_email", // Named constraint to avoid duplication
+				msg: "Email address must be unique",
+			},
 		},
 		password: {
 			type: DataTypes.STRING,
