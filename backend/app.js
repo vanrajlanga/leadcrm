@@ -16,6 +16,7 @@ app.use(
 
 // Middleware
 app.use(express.json()); // Parse JSON request bodies
+app.use(express.urlencoded({ extended: true }));
 
 // Test Database Connection
 sequelize

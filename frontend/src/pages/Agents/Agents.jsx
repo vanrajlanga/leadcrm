@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { AiOutlineArrowLeft, AiOutlineUpload } from "react-icons/ai"; // Importing icons
 import { FaUserPlus, FaEye, FaTrash } from "react-icons/fa"; // Icons for listing actions
 import "./Agents.css";
+import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -28,6 +29,27 @@ const Agents = () => {
 		ifscCode: "",
 		bankAddress: "",
 	});
+
+	const [roles, setRoles] = useState([]);
+
+	const fetchRoles = async () => {
+		try {
+			const response = await axios.get(`${API_URL}/roles`);
+			setRoles(response.data);
+			if (response.data.length > 0) {
+				setFormData((prevData) => ({
+					...prevData,
+					role: response.data[0].name, // Default to the first role
+				}));
+			}
+		} catch (error) {
+			console.error("Error fetching roles:", error);
+		}
+	};
+
+	useEffect(() => {
+		fetchRoles();
+	}, []);
 
 	const agentsPerPage = 5;
 
@@ -77,12 +99,15 @@ const Agents = () => {
 
 		try {
 			const token = localStorage.getItem("token");
+			console.log("Token:", token);
 			const response = await axios.post(
 				`${API_URL}/create-agents`,
 				formDataToSend,
 				{
-					headers: { "Content-Type": "multipart/form-data" },
-					Authorization: `Bearer ${token}`,
+					headers: {
+						"Content-Type": "multipart/form-data",
+						Authorization: `Bearer ${token}`,
+					},
 				}
 			);
 			toast.success("Agent added successfully!");
@@ -359,6 +384,27 @@ const Agents = () => {
 											value={formData.bankAddress}
 											onChange={handleInputChange}
 										></textarea>
+									</div>
+									<div className="col-md-4">
+										<label htmlFor="role">Role:</label>
+										<select
+											id="role_id"
+											name="role_id"
+											className="form-control"
+											value={formData.role_id}
+											onChange={handleInputChange}
+										>
+											{roles
+												.filter(
+													(role) =>
+														role.name !== "Admin" && role.name !== "Super Admin"
+												)
+												.map((role) => (
+													<option key={role.id} value={role.id}>
+														{role.name}
+													</option>
+												))}
+										</select>
 									</div>
 								</div>
 							</div>

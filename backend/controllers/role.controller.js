@@ -1,6 +1,6 @@
 const { Role } = require("../models");
 
-const roles = async (req, res) => async (req, res) => {
+const roles = async (req, res) => {
 	try {
 		const roles = await Role.findAll({
 			attributes: ["id", "name"], // Only return necessary fields
