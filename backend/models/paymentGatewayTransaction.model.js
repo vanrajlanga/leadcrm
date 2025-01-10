@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 
+// Define the PaymentGatewayTransaction model
 const PaymentGatewayTransaction = sequelize.define(
 	"PaymentGatewayTransaction",
 	{
@@ -32,5 +33,68 @@ const PaymentGatewayTransaction = sequelize.define(
 		createdAt: "createdAt",
 	}
 );
+
+// Manage Indexes Function
+const manageIndexes = async () => {
+	const queryInterface = sequelize.getQueryInterface();
+
+	try {
+		// Fetch existing indexes
+		const indexes = await queryInterface.showIndex(
+			"PaymentGatewayTransactions"
+		);
+
+		// Check and add index for `transaction_id`
+		if (!indexes.some((index) => index.name === "transaction_id_index")) {
+			await queryInterface.addIndex(
+				"PaymentGatewayTransactions",
+				["transaction_id"],
+				{
+					name: "transaction_id_index",
+					unique: true,
+				}
+			);
+			console.log(
+				"Index transaction_id_index added for PaymentGatewayTransactions."
+			);
+		} else {
+			console.log(
+				"Index transaction_id_index already exists for PaymentGatewayTransactions."
+			);
+		}
+
+		// Check and add index for `gateway`
+		if (!indexes.some((index) => index.name === "gateway_index")) {
+			await queryInterface.addIndex("PaymentGatewayTransactions", ["gateway"], {
+				name: "gateway_index",
+			});
+			console.log("Index gateway_index added for PaymentGatewayTransactions.");
+		} else {
+			console.log(
+				"Index gateway_index already exists for PaymentGatewayTransactions."
+			);
+		}
+
+		// Check and add index for `status`
+		if (!indexes.some((index) => index.name === "status_index")) {
+			await queryInterface.addIndex("PaymentGatewayTransactions", ["status"], {
+				name: "status_index",
+			});
+			console.log("Index status_index added for PaymentGatewayTransactions.");
+		} else {
+			console.log(
+				"Index status_index already exists for PaymentGatewayTransactions."
+			);
+		}
+	} catch (error) {
+		console.error(
+			"Error managing indexes for PaymentGatewayTransaction:",
+			error
+		);
+	}
+};
+
+// Call the function to manage indexes when the model is loaded
+manageIndexes();
 
 module.exports = PaymentGatewayTransaction;

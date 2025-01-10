@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 
+// Define the Agent model
 const Agent = sequelize.define(
 	"Agent",
 	{
@@ -40,6 +41,30 @@ const Agent = sequelize.define(
 		address: {
 			type: DataTypes.STRING,
 			allowNull: false,
+		},
+		state: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		country: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		city: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		pincode: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		joiningDate: {
+			type: DataTypes.DATE,
+			allowNull: true,
+		},
+		experience: {
+			type: DataTypes.INTEGER,
+			allowNull: true,
 		},
 		aadharCard: {
 			type: DataTypes.STRING,
@@ -100,5 +125,33 @@ const Agent = sequelize.define(
 		updatedAt: "updatedAt",
 	}
 );
+
+// Manage Indexes Function
+const manageIndexes = async () => {
+	const queryInterface = sequelize.getQueryInterface();
+
+	try {
+		// Check if the index for `user_id` exists
+		const indexes = await queryInterface.showIndex("Agents");
+		const userIdIndexExists = indexes.some(
+			(index) => index.name === "user_id_index"
+		);
+
+		// Add the index if it doesn't exist
+		if (!userIdIndexExists) {
+			await queryInterface.addIndex("Agents", ["user_id"], {
+				name: "user_id_index",
+			});
+			console.log("Index user_id_index added for Agents.");
+		} else {
+			console.log("Index user_id_index already exists for Agents.");
+		}
+	} catch (error) {
+		console.error("Error managing indexes for Agent:", error);
+	}
+};
+
+// Call the function to manage indexes when the model is loaded
+manageIndexes();
 
 module.exports = Agent;

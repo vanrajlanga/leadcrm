@@ -4,7 +4,11 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const moment = require("moment");
 const multer = require("multer");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const {
+	S3Client,
+	PutObjectCommand,
+	DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
 
 // Configure AWS S3 Client
 const s3Client =
@@ -95,7 +99,7 @@ const createAgents = async (req, res) => {
 			// Create the agent with the user ID
 			const agentData = {
 				...req.body,
-				user_id: user.id, // Include the user ID in the agent record
+				user_id: user.id,
 				aadharCard: aadharCardUrl,
 				panCard: panCardUrl,
 				bankPassbook: bankPassbookUrl,
@@ -132,6 +136,94 @@ const createAgents = async (req, res) => {
 	});
 };
 
+// Read all agents
+const getAgents = async (req, res) => {
+	try {
+		// res.status(200).send({ message: "Hello from the agent controller" });
+		// Ensure the alias matches the one defined in your model association
+		const agents = await Agent.findAll({
+			include: [
+				{
+					model: User,
+					as: "user", // Replace "user" with the alias defined in your association
+				},
+			],
+		});
+		res.status(200).send(agents);
+	} catch (error) {
+		console.error("Error fetching agents:", error);
+		res.status(500).send({ error: "Failed to fetch agents" });
+	}
+};
+
+// Read a single agent
+const getAgentById = async (req, res) => {
+	try {
+		const agent = await Agent.findByPk(req.params.id, { include: [User] });
+		if (!agent) {
+			return res.status(404).send({ error: "Agent not found" });
+		}
+		res.status(200).send(agent);
+	} catch (error) {
+		console.error("Error fetching agent:", error);
+		res.status(500).send({ error: "Failed to fetch agent" });
+	}
+};
+
+// Update an agent
+const updateAgent = async (req, res) => {
+	try {
+		const agent = await Agent.findByPk(req.params.id);
+		if (!agent) {
+			return res.status(404).send({ error: "Agent not found" });
+		}
+
+		await agent.update(req.body);
+		res.status(200).send(agent);
+	} catch (error) {
+		console.error("Error updating agent:", error);
+		res.status(500).send({ error: "Failed to update agent" });
+	}
+};
+
+// Delete an agent
+const deleteAgent = async (req, res) => {
+	try {
+		const agent = await Agent.findByPk(req.params.id);
+		if (!agent) {
+			return res.status(404).send({ error: "Agent not found" });
+		}
+
+		// Delete files from S3 if they exist
+		if (s3Client && process.env.AWS_BUCKET_NAME) {
+			const deleteFromS3 = async (fileUrl) => {
+				const key = fileUrl.split(
+					`${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/`
+				)[1];
+				const deleteParams = {
+					Bucket: process.env.AWS_BUCKET_NAME,
+					Key: key,
+				};
+				await s3Client.send(new DeleteObjectCommand(deleteParams));
+			};
+
+			if (agent.aadharCard) await deleteFromS3(agent.aadharCard);
+			if (agent.panCard) await deleteFromS3(agent.panCard);
+			if (agent.bankPassbook) await deleteFromS3(agent.bankPassbook);
+		}
+
+		await agent.destroy();
+		res.status(200).send({ message: "Agent deleted successfully" });
+	} catch (error) {
+		console.error("Error deleting agent:", error);
+		res.status(500).send({ error: "Failed to delete agent" });
+	}
+};
+
 module.exports = {
 	createAgents,
+	getAgents,
+	getAgentById,
+	updateAgent,
+	deleteAgent,
 };

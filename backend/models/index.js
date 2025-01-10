@@ -201,7 +201,7 @@ sequelize
 	.authenticate()
 	.then(() => {
 		console.log("Database connection established successfully.");
-		return sequelize.sync({ force: false }); // Use migrations in production
+		return sequelize.sync({ alter: true }); // Use migrations in production
 	})
 	.then(() => {
 		console.log("All models synchronized successfully.");

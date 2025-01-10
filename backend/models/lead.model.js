@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 
+// Define the Lead model
 const Lead = sequelize.define(
 	"Lead",
 	{
@@ -51,5 +52,50 @@ const Lead = sequelize.define(
 		updatedAt: "updatedAt",
 	}
 );
+
+// Manage Indexes Function
+const manageIndexes = async () => {
+	const queryInterface = sequelize.getQueryInterface();
+
+	try {
+		// Fetch existing indexes
+		const indexes = await queryInterface.showIndex("Leads");
+
+		// Check and add index for `email`
+		if (!indexes.some((index) => index.name === "email_index")) {
+			await queryInterface.addIndex("Leads", ["email"], {
+				name: "email_index",
+			});
+			console.log("Index email_index added for Leads.");
+		} else {
+			console.log("Index email_index already exists for Leads.");
+		}
+
+		// Check and add index for `phone`
+		if (!indexes.some((index) => index.name === "phone_index")) {
+			await queryInterface.addIndex("Leads", ["phone"], {
+				name: "phone_index",
+			});
+			console.log("Index phone_index added for Leads.");
+		} else {
+			console.log("Index phone_index already exists for Leads.");
+		}
+
+		// Check and add index for `trackingId`
+		if (!indexes.some((index) => index.name === "tracking_id_index")) {
+			await queryInterface.addIndex("Leads", ["trackingId"], {
+				name: "tracking_id_index",
+			});
+			console.log("Index tracking_id_index added for Leads.");
+		} else {
+			console.log("Index tracking_id_index already exists for Leads.");
+		}
+	} catch (error) {
+		console.error("Error managing indexes for Lead:", error);
+	}
+};
+
+// Call the function to manage indexes when the model is loaded
+manageIndexes();
 
 module.exports = Lead;
