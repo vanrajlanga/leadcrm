@@ -1,6 +1,11 @@
 import React from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
+const formatDate = (date) => {
+	if (!date) return ""; // Handle empty or undefined dates
+	return new Date(date).toISOString().split("T")[0]; // Format to "yyyy-MM-dd"
+};
+
 const AgentForm = ({
 	formData,
 	roles,
@@ -33,7 +38,6 @@ const AgentForm = ({
 					<div className="card-body">
 						<h3 className="section-title">Agent Details</h3>
 						<div className="row g-3">
-							{/* Existing Fields */}
 							<div className="col-lg-4 col-md-6">
 								<label htmlFor="firstName" className="form-label">
 									First Name
@@ -42,7 +46,7 @@ const AgentForm = ({
 									type="text"
 									className="form-control"
 									id="firstName"
-									value={formData.firstName}
+									value={formData.firstName || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -54,7 +58,7 @@ const AgentForm = ({
 									type="text"
 									className="form-control"
 									id="lastName"
-									value={formData.lastName}
+									value={formData.lastName || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -66,7 +70,7 @@ const AgentForm = ({
 									type="text"
 									className="form-control"
 									id="gender"
-									value={formData.gender}
+									value={formData.gender || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -78,7 +82,7 @@ const AgentForm = ({
 									type="date"
 									className="form-control"
 									id="dob"
-									value={formData.dob}
+									value={formatDate(formData.dob)}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -90,7 +94,7 @@ const AgentForm = ({
 									type="email"
 									className="form-control"
 									id="email"
-									value={formData.email}
+									value={formData.email || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -104,24 +108,23 @@ const AgentForm = ({
 										type="tel"
 										className="form-control"
 										id="phone"
-										value={formData.phone}
+										value={formData.phone || ""}
 										onChange={handleInputChange}
 									/>
 								</div>
 							</div>
-							<div className="col-12">
-								<label htmlFor="address" className="form-label">
-									Address
+							<div className="col-lg-4 col-md-6">
+								<label htmlFor="city" className="form-label">
+									City
 								</label>
-								<textarea
+								<input
+									type="text"
 									className="form-control"
-									id="address"
-									rows="3"
-									value={formData.address}
+									id="city"
+									value={formData.city || ""}
 									onChange={handleInputChange}
-								></textarea>
+								/>
 							</div>
-							{/* New Fields */}
 							<div className="col-lg-4 col-md-6">
 								<label htmlFor="state" className="form-label">
 									State
@@ -130,7 +133,7 @@ const AgentForm = ({
 									type="text"
 									className="form-control"
 									id="state"
-									value={formData.state}
+									value={formData.state || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -142,21 +145,21 @@ const AgentForm = ({
 									type="text"
 									className="form-control"
 									id="country"
-									value={formData.country}
+									value={formData.country || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
-							<div className="col-lg-4 col-md-6">
-								<label htmlFor="city" className="form-label">
-									City
+							<div className="col-12">
+								<label htmlFor="address" className="form-label">
+									Address
 								</label>
-								<input
-									type="text"
+								<textarea
 									className="form-control"
-									id="city"
-									value={formData.city}
+									id="address"
+									rows="3"
+									value={formData.address || ""}
 									onChange={handleInputChange}
-								/>
+								></textarea>
 							</div>
 							<div className="col-lg-4 col-md-6">
 								<label htmlFor="pincode" className="form-label">
@@ -166,7 +169,7 @@ const AgentForm = ({
 									type="text"
 									className="form-control"
 									id="pincode"
-									value={formData.pincode}
+									value={formData.pincode || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -178,19 +181,19 @@ const AgentForm = ({
 									type="date"
 									className="form-control"
 									id="joiningDate"
-									value={formData.joiningDate}
+									value={formatDate(formData.joiningDate)}
 									onChange={handleInputChange}
 								/>
 							</div>
 							<div className="col-lg-4 col-md-6">
 								<label htmlFor="experience" className="form-label">
-									Experience (Years)
+									Experience
 								</label>
 								<input
-									type="number"
+									type="text"
 									className="form-control"
 									id="experience"
-									value={formData.experience}
+									value={formData.experience || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -198,12 +201,11 @@ const AgentForm = ({
 					</div>
 				</div>
 
-				{/* Add Document Details Section */}
+				{/* Document Details Section */}
 				<div className="card mb-4">
 					<div className="card-body">
 						<h3 className="section-title">Document Details</h3>
 						<div className="row g-3">
-							{/* Document Upload Fields */}
 							<div className="col-md-4">
 								<p className="document-name">Aadhar Card</p>
 								<input
@@ -245,7 +247,7 @@ const AgentForm = ({
 									type="number"
 									className="form-control"
 									id="monthly_target"
-									value={formData.monthly_target}
+									value={formData.monthly_target || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -257,7 +259,7 @@ const AgentForm = ({
 									type="number"
 									className="form-control"
 									id="quarterly_target"
-									value={formData.quarterly_target}
+									value={formData.quarterly_target || ""}
 									onChange={handleInputChange}
 								/>
 							</div>
@@ -269,9 +271,125 @@ const AgentForm = ({
 									type="number"
 									className="form-control"
 									id="yearly_target"
-									value={formData.yearly_target}
+									value={formData.yearly_target || ""}
 									onChange={handleInputChange}
 								/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Account Details Section */}
+				<div className="card mb-4">
+					<div className="card-body">
+						<h3 className="section-title">Account Details</h3>
+						<div className="row g-3">
+							<div className="col-md-4">
+								<label htmlFor="bankName" className="form-label">
+									Bank Name
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									id="bankName"
+									value={formData.bankName || ""}
+									onChange={handleInputChange}
+								/>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="branchName" className="form-label">
+									Branch Name
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									id="branchName"
+									value={formData.branchName || ""}
+									onChange={handleInputChange}
+								/>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="name" className="form-label">
+									Name
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									id="name"
+									value={formData.name || ""}
+									onChange={handleInputChange}
+								/>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="accountNumber" className="form-label">
+									Account Number
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									id="accountNumber"
+									value={formData.accountNumber || ""}
+									onChange={handleInputChange}
+								/>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="reEnterAccountNumber" className="form-label">
+									Re-Enter Account Number
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									id="reEnterAccountNumber"
+									value={formData.reEnterAccountNumber || ""}
+									onChange={handleInputChange}
+								/>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="ifscCode" className="form-label">
+									IFSC CODE
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									id="ifscCode"
+									value={formData.ifscCode || ""}
+									onChange={handleInputChange}
+								/>
+							</div>
+							<div className="col-12">
+								<label htmlFor="bankAddress" className="form-label">
+									Bank Address
+								</label>
+								<textarea
+									className="form-control"
+									id="bankAddress"
+									rows="3"
+									value={formData.bankAddress || ""}
+									onChange={handleInputChange}
+								></textarea>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="role" className="form-label">
+									Role:
+								</label>
+								<select
+									id="role_id"
+									name="role_id"
+									className="form-control"
+									value={formData.role_id || ""}
+									onChange={handleInputChange}
+								>
+									{roles
+										.filter(
+											(role) =>
+												role.name !== "Admin" && role.name !== "Super Admin"
+										)
+										.map((role) => (
+											<option key={role.id} value={role.id}>
+												{role.name}
+											</option>
+										))}
+								</select>
 							</div>
 						</div>
 					</div>

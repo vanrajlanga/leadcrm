@@ -45,6 +45,10 @@ const Lead = sequelize.define(
 		eventTimestamp: {
 			type: DataTypes.DATE,
 		},
+		recordAudio: {
+			type: DataTypes.STRING, // Stores the S3 URL of the uploaded audio file
+			allowNull: true,
+		},
 	},
 	{
 		timestamps: true,

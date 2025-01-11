@@ -20,10 +20,19 @@ const Agents = () => {
 		dob: "",
 		email: "",
 		phone: "",
+		city: "",
+		state: "",
+		country: "",
 		address: "",
+		pincode: "",
+		joiningDate: "",
+		experience: "",
 		aadharCard: null,
 		panCard: null,
 		bankPassbook: null,
+		monthly_target: "",
+		quarterly_target: "",
+		yearly_target: "",
 		bankName: "",
 		branchName: "",
 		name: "",
@@ -158,6 +167,7 @@ const Agents = () => {
 					handleEditAgent={handleEditAgent}
 					handleDeleteAgent={handleDeleteAgent}
 					setIsFormVisible={setIsFormVisible}
+					setIsEditMode={setIsEditMode}
 				/>
 			)}
 		</div>

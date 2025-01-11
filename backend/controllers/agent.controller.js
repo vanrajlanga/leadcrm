@@ -111,7 +111,7 @@ const createAgents = async (req, res) => {
 			const transporter = nodemailer.createTransport({
 				host: "smtp-relay.brevo.com",
 				port: 587,
-				secure: false, // true for 465, false for other ports
+				secure: true,
 				auth: {
 					user: process.env.SMTP_USER,
 					pass: process.env.SMTP_PASS,
@@ -159,10 +159,19 @@ const getAgents = async (req, res) => {
 // Read a single agent
 const getAgentById = async (req, res) => {
 	try {
-		const agent = await Agent.findByPk(req.params.id, { include: [User] });
+		const agent = await Agent.findByPk(req.body.id, {
+			include: [
+				{
+					model: User,
+					as: "user", // Specify the alias defined in the association
+				},
+			],
+		});
+
 		if (!agent) {
 			return res.status(404).send({ error: "Agent not found" });
 		}
+
 		res.status(200).send(agent);
 	} catch (error) {
 		console.error("Error fetching agent:", error);
@@ -173,7 +182,7 @@ const getAgentById = async (req, res) => {
 // Update an agent
 const updateAgent = async (req, res) => {
 	try {
-		const agent = await Agent.findByPk(req.params.id);
+		const agent = await Agent.findByPk(req.body.id);
 		if (!agent) {
 			return res.status(404).send({ error: "Agent not found" });
 		}
@@ -189,7 +198,8 @@ const updateAgent = async (req, res) => {
 // Delete an agent
 const deleteAgent = async (req, res) => {
 	try {
-		const agent = await Agent.findByPk(req.params.id);
+		const agent = await Agent.findByPk(req.body.id);
+
 		if (!agent) {
 			return res.status(404).send({ error: "Agent not found" });
 		}
@@ -212,7 +222,13 @@ const deleteAgent = async (req, res) => {
 			if (agent.bankPassbook) await deleteFromS3(agent.bankPassbook);
 		}
 
+		// Delete the agent
 		await agent.destroy();
+
+		// Delete the user and user role
+		await UserRole.destroy({ where: { user_id: agent.user_id } });
+		await User.destroy({ where: { id: agent.user_id } });
+
 		res.status(200).send({ message: "Agent deleted successfully" });
 	} catch (error) {
 		console.error("Error deleting agent:", error);

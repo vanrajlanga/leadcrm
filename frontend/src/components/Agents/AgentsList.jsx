@@ -9,23 +9,38 @@ const AgentsList = ({
 	handleEditAgent,
 	handleDeleteAgent,
 	setIsFormVisible,
+	setIsEditMode,
 }) => {
 	const agentsPerPage = 5;
 	const indexOfLastAgent = currentPage * agentsPerPage;
 	const indexOfFirstAgent = indexOfLastAgent - agentsPerPage;
 	const currentAgents = agents.slice(indexOfFirstAgent, indexOfLastAgent);
 
+	const calculateAge = (dob) => {
+		if (!dob) return null;
+		const birthDate = new Date(dob);
+		const ageDifMs = Date.now() - birthDate.getTime();
+		const ageDate = new Date(ageDifMs);
+		return Math.abs(ageDate.getUTCFullYear() - 1970);
+	};
+
 	return (
 		<>
 			<div className="d-flex justify-content-between align-items-center mb-4">
 				<h3 className="title">Agents Listing</h3>
-				<button className="btn btn-dark" onClick={() => setIsFormVisible(true)}>
+				<button
+					className="btn btn-dark"
+					onClick={() => {
+						setIsFormVisible(true);
+						setIsEditMode(false);
+					}}
+				>
 					<FaUserPlus className="me-2" /> Add Agents
 				</button>
 			</div>
 
 			<div className="card">
-				{agents ? JSON.stringify(agents) : "No agents available"}
+				{/* {agents ? JSON.stringify(agents) : "No agents available"} */}
 				<div className="card-body table-responsive">
 					<table className="table table-hover">
 						<thead>
@@ -49,7 +64,7 @@ const AgentsList = ({
 									<td>{agent.email}</td>
 									<td>{agent.experience}</td>
 									<td>{agent.gender}</td>
-									<td>{agent.age}</td>
+									<td>{calculateAge(agent.dob)}</td>
 									<td>
 										<button
 											className="btn btn-dark btn-sm me-2"

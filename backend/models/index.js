@@ -29,7 +29,7 @@ User.belongsToMany(Role, {
 	foreignKey: {
 		name: "user_id",
 		allowNull: false,
-		constraints: false, // Disable auto constraints to avoid redundancy
+		index: false,
 	},
 });
 Role.belongsToMany(User, {
@@ -38,27 +38,7 @@ Role.belongsToMany(User, {
 	foreignKey: {
 		name: "role_id",
 		allowNull: false,
-		constraints: false,
-	},
-});
-
-// Role and Permission (Many-to-Many)
-Role.belongsToMany(Permission, {
-	through: RolePermission,
-	as: "permissions",
-	foreignKey: {
-		name: "role_id",
-		allowNull: false,
-		constraints: false,
-	},
-});
-Permission.belongsToMany(Role, {
-	through: RolePermission,
-	as: "roles",
-	foreignKey: {
-		name: "permission_id",
-		allowNull: false,
-		constraints: false,
+		index: false,
 	},
 });
 
@@ -68,6 +48,7 @@ Agent.belongsTo(User, {
 	foreignKey: {
 		name: "user_id",
 		allowNull: false,
+		index: false,
 	},
 });
 User.hasOne(Agent, {
@@ -75,47 +56,8 @@ User.hasOne(Agent, {
 	foreignKey: {
 		name: "user_id",
 		allowNull: false,
+		index: false,
 	},
-});
-
-// Agent and Lead (One-to-Many)
-Lead.belongsTo(Agent, {
-	as: "agent",
-	foreignKey: {
-		name: "agent_id",
-		allowNull: false,
-		constraints: false,
-	},
-});
-Agent.hasMany(Lead, {
-	as: "leads",
-	foreignKey: "agent_id",
-});
-
-// Lead and Quote (One-to-Many)
-Quote.belongsTo(Lead, {
-	as: "lead",
-	foreignKey: {
-		name: "lead_id",
-		allowNull: false,
-	},
-});
-Lead.hasMany(Quote, {
-	as: "quotes",
-	foreignKey: "lead_id",
-});
-
-// Lead and Sale (One-to-Many)
-Sale.belongsTo(Lead, {
-	as: "lead",
-	foreignKey: {
-		name: "lead_id",
-		allowNull: false,
-	},
-});
-Lead.hasMany(Sale, {
-	as: "sales",
-	foreignKey: "lead_id",
 });
 
 // Lead and Ticket (One-to-Many)
@@ -124,75 +66,11 @@ Ticket.belongsTo(Lead, {
 	foreignKey: {
 		name: "lead_id",
 		allowNull: false,
+		index: false,
 	},
 });
 Lead.hasMany(Ticket, {
 	as: "tickets",
-	foreignKey: "lead_id",
-});
-
-// User and Notification (One-to-Many)
-Notification.belongsTo(User, {
-	as: "user",
-	foreignKey: {
-		name: "user_id",
-		allowNull: false,
-	},
-});
-User.hasMany(Notification, {
-	as: "notifications",
-	foreignKey: "user_id",
-});
-
-// PaymentGatewayTransaction and PaymentHistory (One-to-Many)
-PaymentHistory.belongsTo(PaymentGatewayTransaction, {
-	as: "transaction",
-	foreignKey: {
-		name: "transaction_id",
-		allowNull: false,
-	},
-});
-PaymentGatewayTransaction.hasMany(PaymentHistory, {
-	as: "paymentHistories",
-	foreignKey: "transaction_id",
-});
-
-// User and Session (One-to-Many)
-Session.belongsTo(User, {
-	as: "user",
-	foreignKey: {
-		name: "user_id",
-		allowNull: false,
-	},
-});
-User.hasMany(Session, {
-	as: "sessions",
-	foreignKey: "user_id",
-});
-
-// User and Notes (One-to-Many)
-Note.belongsTo(User, {
-	as: "user",
-	foreignKey: {
-		name: "user_id",
-		allowNull: false,
-	},
-});
-User.hasMany(Note, {
-	as: "notes",
-	foreignKey: "user_id",
-});
-
-// Lead and Notes (One-to-Many)
-Note.belongsTo(Lead, {
-	as: "lead",
-	foreignKey: {
-		name: "lead_id",
-		allowNull: false,
-	},
-});
-Lead.hasMany(Note, {
-	as: "notes",
 	foreignKey: "lead_id",
 });
 
@@ -201,7 +79,7 @@ sequelize
 	.authenticate()
 	.then(() => {
 		console.log("Database connection established successfully.");
-		return sequelize.sync({ alter: true }); // Use migrations in production
+		return sequelize.sync({ alter: true });
 	})
 	.then(() => {
 		console.log("All models synchronized successfully.");

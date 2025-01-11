@@ -12,7 +12,6 @@ const PaymentGatewayTransaction = sequelize.define(
 		},
 		transaction_id: {
 			type: DataTypes.STRING,
-			unique: true,
 			allowNull: false,
 		},
 		gateway: {
@@ -43,25 +42,6 @@ const manageIndexes = async () => {
 		const indexes = await queryInterface.showIndex(
 			"PaymentGatewayTransactions"
 		);
-
-		// Check and add index for `transaction_id`
-		if (!indexes.some((index) => index.name === "transaction_id_index")) {
-			await queryInterface.addIndex(
-				"PaymentGatewayTransactions",
-				["transaction_id"],
-				{
-					name: "transaction_id_index",
-					unique: true,
-				}
-			);
-			console.log(
-				"Index transaction_id_index added for PaymentGatewayTransactions."
-			);
-		} else {
-			console.log(
-				"Index transaction_id_index already exists for PaymentGatewayTransactions."
-			);
-		}
 
 		// Check and add index for `gateway`
 		if (!indexes.some((index) => index.name === "gateway_index")) {
