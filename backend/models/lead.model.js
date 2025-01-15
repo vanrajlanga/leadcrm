@@ -25,6 +25,7 @@ const Lead = sequelize.define(
 		},
 		parts: {
 			type: DataTypes.STRING,
+			comment: "Category In Frontend",
 		},
 		makeModels: {
 			type: DataTypes.STRING,
@@ -47,6 +48,18 @@ const Lead = sequelize.define(
 		},
 		recordAudio: {
 			type: DataTypes.STRING, // Stores the S3 URL of the uploaded audio file
+			allowNull: true,
+		},
+		cost_price: {
+			type: DataTypes.DECIMAL(10, 2),
+			allowNull: true,
+		},
+		selling_price: {
+			type: DataTypes.DECIMAL(10, 2),
+			allowNull: true,
+		},
+		reference_by: {
+			type: DataTypes.INTEGER,
 			allowNull: true,
 		},
 	},

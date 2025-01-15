@@ -15,7 +15,7 @@ const PaymentGatewayTransaction = sequelize.define(
 			allowNull: false,
 		},
 		gateway: {
-			type: DataTypes.ENUM("stripe", "paypal"),
+			type: DataTypes.ENUM("stripe", "paypal", "sqaure"),
 			allowNull: false,
 		},
 		amount: {
