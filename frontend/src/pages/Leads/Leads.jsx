@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Leads.css';
 import { AiOutlineEye } from 'react-icons/ai';
 import { MdPerson,MdOutlinePhone, MdOutlineEmail} from 'react-icons/md';
 import {  IoMdCalendar, IoIosMore } from 'react-icons/io';
+import AddQuotation from '../../components/Quotation/addQuotation';
 
 const Leads = () => {
     // Local data array
@@ -23,6 +24,8 @@ const Leads = () => {
             agent: 'Agent 3', date: '2022-12-31', status: 'Converted'
         }
     ];
+
+    const [openModal, setOpenModal] = useState(false);
 
     return (
         <div className="table-container" style={{ maxWidth: 'calc(300px * 7)' }}>
@@ -60,7 +63,7 @@ const Leads = () => {
                             <td style={{ color: getStatusColor(row.status) }}>{row.date}</td>
                             <td className="status-cell"><div className={`status ${getStatusClassName(row.status)}`}>{row.status}</div></td>
                             <td><button className="view-btn"><AiOutlineEye /></button></td>
-                            <td><button className="quotation-btn">Quotation</button></td>
+                            <td><button className="quotation-btn" onClick={() => { setOpenModal(true) }}>Quotation</button></td>
                             <td>
                             <button className="action-btn"><MdPerson /></button>
                             <button className="action-btn"><IoMdCalendar /></button>
@@ -70,6 +73,7 @@ const Leads = () => {
                     ))}
                 </tbody>
             </table>
+            { openModal && <AddQuotation closeModal={setOpenModal} />}
         </div>
     );
 };
