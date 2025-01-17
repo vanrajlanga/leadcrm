@@ -26,6 +26,11 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 		setIsVendorModalOpen(true);
 	};
 
+	const openQuotationModal = (lead) => {
+		setSelectedLead(lead);
+		setOpenModal(true);
+	};
+
 	// Close the vendor modal
 	const closeVendorModal = () => {
 		setSelectedLead(null);
@@ -158,7 +163,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 							<td>
 								<button
 									className="quotation-btn"
-									onClick={() => setOpenModal(true)}
+									onClick={() => openQuotationModal(lead)}
 								>
 									Quotation
 								</button>
@@ -178,7 +183,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 					))}
 				</tbody>
 			</table>
-			{openModal && <AddQuotation closeModal={() => setOpenModal(false)} />}
+			{openModal && <AddQuotation closeModal={() => setOpenModal(false)} lead={selectedLead} />}
 
 			{isVendorModalOpen && selectedLead && (
 				<div className="custom-modal-overlay">

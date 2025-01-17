@@ -25,6 +25,10 @@ const {
 	deleteVendor,
 } = require("../controllers/vendor.controller");
 
+const {
+	createQuotation,
+} = require("../controllers/quotation.controller");
+
 const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -55,5 +59,8 @@ router.post("/get-vendors", authenticate, getAllVendors);
 router.post("/get-vendor", authenticate, getVendorById);
 router.post("/update-vendor", authenticate, updateVendor);
 router.post("/delete-vendor", authenticate, deleteVendor);
+
+// Quotation Routes
+router.post("/create-quotations", authenticate, createQuotation);
 
 module.exports = router;

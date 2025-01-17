@@ -19,10 +19,30 @@ const Quote = sequelize.define(
 			allowNull: false,
 		},
 		quote_details: {
-			type: DataTypes.JSON,
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
-		total_price: {
+		product_name: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+		voucher: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+		selling_price: {
+			type: DataTypes.DECIMAL(10, 2),
+			defaultValue: 0.0,
+		},
+		product_price: {
+			type: DataTypes.DECIMAL(10, 2),
+			defaultValue: 0.0,
+		},
+		shipping: {
+			type: DataTypes.DECIMAL(10, 2),
+			defaultValue: 0.0,
+		},
+		tax: {
 			type: DataTypes.DECIMAL(10, 2),
 			defaultValue: 0.0,
 		},
@@ -37,8 +57,8 @@ const Quote = sequelize.define(
 	},
 	{
 		timestamps: true,
-		createdAt: "createdAt",
-		updatedAt: "updatedAt",
+		createdAt: "created_at",
+		updatedAt: "updated_at",
 	}
 );
 
