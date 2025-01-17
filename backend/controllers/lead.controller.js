@@ -1,4 +1,4 @@
-const Lead = require("../models/lead.model");
+const { Lead, Agent } = require("../models");
 const multer = require("multer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const moment = require("moment");
@@ -73,20 +73,30 @@ const createLead = async (req, res) => {
 // Get all leads
 const getAllLeads = async (req, res) => {
 	try {
-		const leads = await Lead.findAll();
-		res.status(200).json({
-			message: "Leads fetched successfully.",
-			data: leads,
+		const leadsWithAgents = await Lead.findAll({
+			include: [
+				{
+					model: Agent,
+					as: "agent", // Specify the alias here
+					attributes: ["firstName", "lastName"],
+				},
+			],
 		});
+		const leads = leadsWithAgents.map((lead) => ({
+			...lead.toJSON(),
+			agent: lead.agent
+				? `${lead.agent.firstName} ${lead.agent.lastName}`
+				: null,
+		}));
+
+		res.status(200).json(leads);
 	} catch (error) {
-		console.error("Error fetching leads:", error);
 		res.status(500).json({
 			message: "Failed to fetch leads.",
 			error: error.message,
 		});
 	}
 };
-
 // Get a single lead by ID
 const getLeadById = async (req, res) => {
 	const { id } = req.params;

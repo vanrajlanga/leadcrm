@@ -8,6 +8,23 @@ const {
 	updateAgent,
 	deleteAgent,
 } = require("../controllers/agent.controller");
+
+const {
+	createLead,
+	getAllLeads,
+	getLeadById,
+	updateLead,
+	deleteLead,
+} = require("../controllers/lead.controller");
+
+const {
+	createVendor,
+	getAllVendors,
+	getVendorById,
+	updateVendor,
+	deleteVendor,
+} = require("../controllers/vendor.controller");
+
 const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -17,10 +34,26 @@ router.post("/auth/login", login);
 router.get("/roles", roles);
 
 // Protected Routes
+
+// Agent Routes
 router.post("/create-agent", authenticate, createAgents);
 router.post("/get-agents", authenticate, getAgents);
 router.post("/get-agent", authenticate, getAgentById);
 router.post("/update-agent", authenticate, updateAgent);
 router.post("/delete-agent", authenticate, deleteAgent);
+
+// Lead Routes
+router.post("/create-lead", authenticate, createLead);
+router.post("/get-leads", authenticate, getAllLeads);
+router.post("/get-lead", authenticate, getLeadById);
+router.post("/update-lead", authenticate, updateLead);
+router.post("/delete-lead", authenticate, deleteLead);
+
+// Vendor Routes
+router.post("/create-vendor", authenticate, createVendor);
+router.post("/get-vendors", authenticate, getAllVendors);
+router.post("/get-vendor", authenticate, getVendorById);
+router.post("/update-vendor", authenticate, updateVendor);
+router.post("/delete-vendor", authenticate, deleteVendor);
 
 module.exports = router;

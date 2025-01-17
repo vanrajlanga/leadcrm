@@ -19,7 +19,7 @@ const SystemAnalytics = require("./systemAnalytics.model");
 const Template = require("./template.model");
 const Note = require("./note.model");
 const Reminder = require("./reminder.model");
-
+const Vendor = require("./vendor.model");
 // Associations
 
 // User and Role (Many-to-Many)
@@ -74,6 +74,24 @@ Lead.hasMany(Ticket, {
 	foreignKey: "lead_id",
 });
 
+Lead.belongsTo(Agent, {
+	foreignKey: {
+		name: "agent_id",
+		allowNull: false,
+		index: false,
+	},
+	as: "agent",
+});
+
+Agent.hasMany(Lead, {
+	foreignKey: {
+		name: "agent_id",
+		allowNull: false,
+		index: false,
+	},
+	as: "leads",
+});
+
 // Sync models with the database
 sequelize
 	.authenticate()
@@ -109,4 +127,5 @@ module.exports = {
 	Template,
 	Note,
 	Reminder,
+	Vendor,
 };

@@ -58,8 +58,17 @@ const Lead = sequelize.define(
 			type: DataTypes.DECIMAL(10, 2),
 			allowNull: true,
 		},
-		reference_by: {
-			type: DataTypes.INTEGER,
+		reference: {
+			type: DataTypes.ENUM("website", "manual"),
+			allowNull: true,
+		},
+		agent_id: {
+			// Foreign Key
+			type: DataTypes.BIGINT,
+			allowNull: true,
+		},
+		followup_date: {
+			type: DataTypes.DATE,
 			allowNull: true,
 		},
 	},
