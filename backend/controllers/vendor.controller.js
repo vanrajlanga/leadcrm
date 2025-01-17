@@ -4,6 +4,7 @@ const { Vendor } = require("../models");
 const createVendor = async (req, res) => {
 	try {
 		// Create the vendor
+		req.body.added_by = req.user.id;
 		const newVendor = await Vendor.create({
 			...req.body,
 		});
@@ -36,7 +37,7 @@ const getAllVendors = async (req, res) => {
 
 // Get a single vendor by ID
 const getVendorById = async (req, res) => {
-	const { id } = req.params;
+	const { id } = req.body;
 
 	try {
 		const vendor = await Vendor.findByPk(id);
@@ -62,7 +63,7 @@ const getVendorById = async (req, res) => {
 
 // Update a vendor by ID
 const updateVendor = async (req, res) => {
-	const { id } = req.params;
+	const { id } = req.body;
 
 	try {
 		// Update the vendor
@@ -93,7 +94,7 @@ const updateVendor = async (req, res) => {
 
 // Delete a vendor by ID
 const deleteVendor = async (req, res) => {
-	const { id } = req.params;
+	const { id } = req.body;
 
 	try {
 		const deletedRowsCount = await Vendor.destroy({ where: { id } });

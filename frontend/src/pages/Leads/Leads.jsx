@@ -45,13 +45,38 @@ const Leads = () => {
 	};
 	const onAddVendor = async (vendorData) => {
 		try {
-			const response = await axios.post(`${API_URL}/add-vendor`, vendorData, {
-				headers: { Authorization: `Bearer ${token}` },
-			});
+			console.log(vendorData);
+			const response = await axios.post(
+				`${API_URL}/create-vendor`,
+				vendorData,
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
 			toast.success("Vendor added successfully");
 			fetchVendors();
 		} catch (err) {
 			toast.error("Failed to add vendor");
+		}
+	};
+
+	const onSaveCostPrice = async (id, vendor_id, cost_price) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/update-lead`,
+				{
+					id,
+					vendor_id,
+					cost_price,
+				},
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+			toast.success("Cost price saved successfully");
+			fetchLeads();
+		} catch (err) {
+			toast.error("Failed to save cost price");
 		}
 	};
 
@@ -65,7 +90,12 @@ const Leads = () => {
 
 	return (
 		<div className="leads-page">
-			<LeadsList leads={leads} vendors={vendors} onAddVendor={onAddVendor} />
+			<LeadsList
+				leads={leads}
+				vendors={vendors}
+				onAddVendor={onAddVendor}
+				onSaveCostPrice={onSaveCostPrice}
+			/>
 		</div>
 	);
 };

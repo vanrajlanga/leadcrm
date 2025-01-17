@@ -60,6 +60,12 @@ button:hover {
 	font-family: Quando;
 }
 
+.status.pending {
+	background-color: #e3ddff;
+	color: #2600ff; /* Dark text for better contrast */
+	min-width: 100px;
+}
+
 .status.follow-up {
 	background-color: #fffbdd;
 	color: #ffcc00; /* Dark text for better contrast */

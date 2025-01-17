@@ -20,6 +20,7 @@ const Template = require("./template.model");
 const Note = require("./note.model");
 const Reminder = require("./reminder.model");
 const Vendor = require("./vendor.model");
+const CallLog = require("./callLog.model");
 // Associations
 
 // User and Role (Many-to-Many)
@@ -128,4 +129,5 @@ module.exports = {
 	Note,
 	Reminder,
 	Vendor,
+	CallLog,
 };

@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { AiOutlineEye } from "react-icons/ai";
-import { MdPerson, MdOutlinePhone, MdOutlineEmail } from "react-icons/md";
+import {
+	MdPerson,
+	MdOutlinePhone,
+	MdOutlineEmail,
+	MdCallEnd,
+} from "react-icons/md";
 import { IoMdCalendar, IoIosMore } from "react-icons/io";
 import "./LeadsList.css";
 import AddQuotation from "../../components/Quotation/addQuotation";
+import axios from "axios";
 
 const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 	const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
@@ -15,10 +21,12 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 		phone: "",
 		email: "",
 		address: "",
-		cost_price: "",
 	});
 	const [selectedVendorId, setSelectedVendorId] = useState(null);
 	const [costPrice, setCostPrice] = useState("");
+
+	const API_URL = import.meta.env.VITE_API_URL;
+	const token = localStorage.getItem("token");
 
 	// Open the modal to add cost price
 	const openVendorModal = (lead) => {
@@ -41,7 +49,6 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 			phone: "",
 			email: "",
 			address: "",
-			cost_price: "",
 		});
 		setSelectedVendorId(null);
 		setCostPrice("");
@@ -53,8 +60,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 			!vendorData.name ||
 			!vendorData.phone ||
 			!vendorData.email ||
-			!vendorData.address ||
-			!vendorData.cost_price
+			!vendorData.address
 		) {
 			alert("Please fill out all vendor details.");
 			return;
@@ -67,18 +73,82 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 			phone: "",
 			email: "",
 			address: "",
-			cost_price: "",
 		});
 	};
 
 	// Save cost price
-	const handleSaveCostPrice = () => {
+	const handleSaveCostPrice = async () => {
 		if (!selectedVendorId || !costPrice) {
 			alert("Please select a vendor and enter a cost price.");
 			return;
 		}
-		onSaveCostPrice(selectedLead.id, selectedVendorId, costPrice);
-		closeVendorModal();
+		try {
+			await axios.post(
+				`${API_URL}/update-lead`,
+				{
+					id: selectedLead.id,
+					vendor_id: selectedVendorId,
+					cost_price: costPrice,
+				},
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+			onSaveCostPrice(selectedLead.id, selectedVendorId, costPrice);
+			closeVendorModal();
+		} catch (error) {
+			console.error("Error saving cost price:", error);
+			alert("Failed to save cost price. Please try again.");
+		}
+	};
+
+	// Trigger Acefone API to initiate a call
+	const handleCall = async (lead) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/click-to-call`,
+				{
+					lead_id: lead.id,
+					agent_id: 15859029632 || "YOUR_AGENT_ID", // Replace if necessary
+					destination_number: 9898933987,
+					caller_id: 15859029632, // Replace with your caller ID
+				},
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+
+			if (response.data.success) {
+				alert("Call successfully initiated.");
+			} else {
+				alert(`Failed to initiate call: ${response.data.message}`);
+			}
+		} catch (error) {
+			console.error("Error initiating call:", error);
+			alert("Error initiating call. Please try again.");
+		}
+	};
+
+	// Trigger Acefone API to hang up a call
+	const handleHangup = async (callId) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/hangup-call`,
+				{ call_id: callId },
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+
+			if (response.data.success) {
+				alert("Call successfully hung up.");
+			} else {
+				alert(`Failed to hang up call: ${response.data.message}`);
+			}
+		} catch (error) {
+			console.error("Error hanging up the call:", error);
+			alert("Error hanging up the call. Please try again.");
+		}
 	};
 
 	// Utility function to get color based on status
@@ -127,7 +197,15 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 							<td>{lead.id}</td>
 							<td>{lead.name}</td>
 							<td>
-								<MdOutlinePhone className="phone-btn" /> {lead.number}
+								<MdOutlinePhone
+									className="phone-btn"
+									onClick={() => handleCall(lead)}
+								/>{" "}
+								{lead.phone}
+								<MdCallEnd
+									className="phone-btn"
+									onClick={() => handleHangup(lead.call_id)}
+								/>
 							</td>
 							<td>
 								<MdOutlineEmail className="email-btn" /> {lead.email}
@@ -148,7 +226,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 							<td>{lead.reference}</td>
 							<td>{lead.agent}</td>
 							<td style={{ color: getStatusColor(lead.status) }}>
-								{lead.followup_date}
+								{new Date(lead.followup_date).toLocaleDateString("en-GB")}
 							</td>
 							<td className="status-cell">
 								<div className={`status ${getStatusClassName(lead.status)}`}>
@@ -169,13 +247,10 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 								</button>
 							</td>
 							<td>
-								<button className="action-btn">
-									<MdPerson />
-								</button>
-								<button className="action-btn">
-									<IoMdCalendar />
-								</button>
-								<button className="action-btn">
+								<button
+									className="action-btn"
+									onClick={() => handleHangup(lead.call_id)}
+								>
 									<IoIosMore />
 								</button>
 							</td>
@@ -227,7 +302,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 									<label>
 										Phone:
 										<input
-											type="text"
+											type="tel"
 											value={vendorData.phone}
 											onChange={(e) =>
 												setVendorData({ ...vendorData, phone: e.target.value })
@@ -237,7 +312,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 									<label>
 										Email:
 										<input
-											type="text"
+											type="email"
 											value={vendorData.email}
 											onChange={(e) =>
 												setVendorData({ ...vendorData, email: e.target.value })
@@ -257,13 +332,15 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 											}
 										/>
 									</label>
-									<button onClick={handleAddVendor}>Save Vendor</button>
+									<button onClick={handleAddVendor} style={{ float: "right" }}>
+										Save Vendor
+									</button>
 								</div>
 							)}
 							<label>
 								Cost Price:
 								<input
-									type="text"
+									type="number"
 									value={costPrice}
 									onChange={(e) => setCostPrice(e.target.value)}
 								/>

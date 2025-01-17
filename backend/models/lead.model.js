@@ -67,9 +67,17 @@ const Lead = sequelize.define(
 			type: DataTypes.BIGINT,
 			allowNull: true,
 		},
+		vandor_id: {
+			type: DataTypes.BIGINT,
+			allowNull: true,
+		},
 		followup_date: {
 			type: DataTypes.DATE,
 			allowNull: true,
+		},
+		status: {
+			type: DataTypes.ENUM("Pending", "Follow Up", "Converted", "Rejected"),
+			defaultValue: "Pending",
 		},
 	},
 	{
