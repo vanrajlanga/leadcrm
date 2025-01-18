@@ -8,6 +8,7 @@ import Leads from "../pages/Leads/Leads";
 import Agents from "../pages/Agents/Agents";
 import Quotations from "../pages/Quotations/Quotations";
 import Tickets from "../pages/Tickets/Tickets";
+import Payment from "../pages/Payment/Payment";
 
 const AppRoutes = () => {
 	const isAuthenticated = !!localStorage.getItem("token"); // Check if user is logged in
@@ -15,6 +16,7 @@ const AppRoutes = () => {
 	return (
 		<Router>
 			<Routes>
+				<Route path="/payment" element={<Payment />} />
 				{/* Authentication Routes */}
 				{!isAuthenticated && (
 					<Route

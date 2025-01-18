@@ -111,7 +111,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 					lead_id: lead.id,
 					agent_id: 15859029632 || "YOUR_AGENT_ID", // Replace if necessary
 					destination_number: 9898933987,
-					caller_id: 15859029632, // Replace with your caller ID
+					caller_id: "Digvijay", // Replace with your caller ID
 				},
 				{
 					headers: { Authorization: `Bearer ${token}` },
@@ -258,7 +258,12 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 					))}
 				</tbody>
 			</table>
-			{openModal && <AddQuotation closeModal={() => setOpenModal(false)} lead={selectedLead} />}
+			{openModal && (
+				<AddQuotation
+					closeModal={() => setOpenModal(false)}
+					lead={selectedLead}
+				/>
+			)}
 
 			{isVendorModalOpen && selectedLead && (
 				<div className="custom-modal-overlay">

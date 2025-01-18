@@ -31,6 +31,18 @@ const {
 	initiateCall,
 	hangupCall,
 } = require("../controllers/master.controller");
+
+const {
+	createStripePaymentIntent,
+} = require("../controllers/stripe.controller");
+
+const {
+	createOrder,
+	captureOrder,
+} = require("../controllers/paypal.controller");
+
+const { createPayment } = require("../controllers/square.controller");
+
 const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -62,10 +74,21 @@ router.post("/get-vendor", authenticate, getVendorById);
 router.post("/update-vendor", authenticate, updateVendor);
 router.post("/delete-vendor", authenticate, deleteVendor);
 
+// Master Routes
 router.post("/click-to-call", authenticate, initiateCall);
 router.post("/hangup-call", authenticate, hangupCall);
 
 // Quotation Routes
 router.post("/create-quotations", authenticate, createQuotation);
+
+// Stripe Routes
+router.post("/create-stripe-payment-intent", createStripePaymentIntent);
+
+// Paypal Routes
+router.post("/paypal-create-order", createOrder);
+router.post("/paypal-capture-order", captureOrder);
+
+// Square Routes
+router.post("/square-create-payment", createPayment);
 
 module.exports = router;
