@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
+const { response } = require("express");
 
 // Define the CallLog model
 const CallLog = sequelize.define(
@@ -12,36 +13,27 @@ const CallLog = sequelize.define(
 		},
 		lead_id: {
 			type: DataTypes.BIGINT,
-			allowNull: false,
+			allowNull: true,
 		},
 		agent_id: {
 			type: DataTypes.BIGINT,
-			allowNull: false,
+			allowNull: true,
 		},
 		call_id: {
 			type: DataTypes.STRING,
-			allowNull: false,
-		},
-		call_status: {
-			type: DataTypes.ENUM("initiated", "in-progress", "completed", "failed"),
-			defaultValue: "initiated",
-		},
-		duration: {
-			type: DataTypes.INTEGER,
-			defaultValue: 0,
+			allowNull: true,
 		},
 		caller_id: {
 			type: DataTypes.STRING,
+			allowNull: false,
 		},
 		destination_number: {
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-		start_time: {
-			type: DataTypes.DATE,
-		},
-		end_time: {
-			type: DataTypes.DATE,
+		response_json: {
+			type: DataTypes.JSON,
+			allowNull: true,
 		},
 	},
 	{

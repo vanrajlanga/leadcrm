@@ -34,6 +34,7 @@ const {
 const {
 	initiateCall,
 	hangupCall,
+	fetchCallRecordings,
 } = require("../controllers/master.controller");
 
 const {
@@ -81,6 +82,7 @@ router.post("/delete-vendor", authenticate, deleteVendor);
 // Master Routes
 router.post("/click-to-call", authenticate, initiateCall);
 router.post("/hangup-call", authenticate, hangupCall);
+router.get("/fetch-call-recording", fetchCallRecordings);
 
 // Quotation Routes
 router.post("/create-quotations", authenticate, createQuotation);

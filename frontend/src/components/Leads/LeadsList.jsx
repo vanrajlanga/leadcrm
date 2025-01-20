@@ -116,9 +116,9 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 				`${API_URL}/click-to-call`,
 				{
 					lead_id: lead.id,
-					agent_id: 15859029632 || "YOUR_AGENT_ID", // Replace if necessary
-					destination_number: 9898933987,
-					caller_id: "Digvijay", // Replace with your caller ID
+					agent_id: "050297960001", // Replace if necessary
+					destination_number: 19706947211,
+					caller_id: 15859029632, // Replace with your caller ID
 				},
 				{
 					headers: { Authorization: `Bearer ${token}` },

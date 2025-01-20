@@ -1,3 +1,4 @@
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const axios = require("axios");
 const CallLog = require("../models/callLog.model");
 const { Op } = require("sequelize");
@@ -5,6 +6,15 @@ const { Op } = require("sequelize");
 // Acefone Token Variables
 let acefoneToken = null;
 let tokenExpiryTime = null;
+
+// S3 Client Configuration
+const s3Client = new S3Client({
+	region: process.env.AWS_REGION,
+	credentials: {
+		accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	},
+});
 
 // Generate Acefone Token
 const generateToken = async () => {
@@ -52,7 +62,6 @@ const initiateCall = async (req, res) => {
 	try {
 		// Generate token and make API call
 		const token = await getAcefoneToken();
-		console.log("token", token);
 		const response = await axios.post(
 			"https://api.acefone.co.uk/v1/click_to_call",
 			{
@@ -67,7 +76,7 @@ const initiateCall = async (req, res) => {
 				},
 			}
 		);
-		console.log("response", response);
+
 		// Log the call
 		const newLog = await CallLog.create({
 			lead_id,
@@ -134,7 +143,72 @@ const hangupCall = async (req, res) => {
 	}
 };
 
+// Fetch Call Recordings and Upload to S3
+const fetchCallRecordings = async (req, res) => {
+	try {
+		// Generate token and make API call
+		const token = await getAcefoneToken();
+
+		// Fetch recordings from Acefone
+		const response = await axios.get(
+			"https://api.acefone.co.uk/v1/recordings",
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+					Accept: "application/json",
+				},
+			}
+		);
+		console.log("response", response);
+		const recordings = response.data.recordings; // Adjust based on API response structure
+		if (!recordings || recordings.length === 0) {
+			return res.status(200).json({
+				success: true,
+				message: "No recordings found.",
+			});
+		}
+
+		// Process each recording
+		for (const recording of recordings) {
+			// Download the recording file
+			const recordingResponse = await axios.get(recording.url, {
+				responseType: "arraybuffer",
+			});
+
+			// Prepare the S3 upload command
+			const fileName = `recordings/${recording.call_id}_${Date.now()}.mp3`; // Customize file naming
+			const uploadParams = {
+				Bucket: process.env.AWS_S3_BUCKET_NAME,
+				Key: fileName,
+				Body: recordingResponse.data,
+				ContentType: "audio/mpeg",
+			};
+
+			// Upload to S3
+			await s3Client.send(new PutObjectCommand(uploadParams));
+
+			// Update CallLog with S3 URL
+			await CallLog.update(
+				{ recording_url: `s3://${process.env.AWS_S3_BUCKET_NAME}/${fileName}` },
+				{ where: { call_id: recording.call_id } }
+			);
+		}
+
+		res.status(200).json({
+			success: true,
+			message: "Recordings fetched and uploaded to S3 successfully.",
+		});
+	} catch (error) {
+		console.error("Error fetching and uploading recordings:", error.message);
+		res.status(500).json({
+			success: false,
+			message: "Failed to fetch and upload recordings.",
+		});
+	}
+};
+
 module.exports = {
 	initiateCall,
 	hangupCall,
+	fetchCallRecordings,
 };
