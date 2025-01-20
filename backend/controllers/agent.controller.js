@@ -111,7 +111,7 @@ const createAgents = async (req, res) => {
 			const transporter = nodemailer.createTransport({
 				host: "smtp-relay.brevo.com",
 				port: 587,
-				secure: true,
+				secure: false,
 				auth: {
 					user: process.env.SMTP_USER,
 					pass: process.env.SMTP_PASS,
@@ -119,10 +119,10 @@ const createAgents = async (req, res) => {
 			});
 
 			const mailOptions = {
-				from: process.env.SMTP_USER,
+				from: process.env.SMTP_FROM_USER,
 				to: user.email,
 				subject: "Your Account Password",
-				text: `Hello ${user.firstName},\n\nYour account has been created. Your password is: ${password}\n\nPlease change your password after logging in.`,
+				text: `Hello ${user.name},\n\nYour account has been created. Your password is: ${password}\n\nPlease change your password after logging in.`,
 			};
 
 			await transporter.sendMail(mailOptions);
