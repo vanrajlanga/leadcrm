@@ -1,4 +1,4 @@
-const { Quote } = require("../models");
+const { Quote,Agent,Lead } = require("../models");
 const axios = require("axios");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
@@ -6,23 +6,25 @@ const nodemailer = require("nodemailer");
 // Create a new vendor
 const createQuotation = async (req, res) => {
 	try {
-		// Create the vendor
-		const newQuotation = await Quote.create({
-			...req.body,
-		});
 
 		const generateRandomString = (length) => {
 			return crypto.randomBytes(length).toString("hex").slice(0, length);
 		};
+		
+		req.body.payment_token = generateRandomString(16);
+		const newQuotation = await Quote.create({
+			...req.body,
+		});
 
-		// const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5Nzk2LCJpc3MiOiJodHRwczpcL1wvc2VydmljZS5hY2Vmb25lLmNvLnVrXC90b2tlblwvZ2VuZXJhdGUiLCJpYXQiOjE3MzcxMTkxMDEsImV4cCI6MjAzNzExOTEwMSwibmJmIjoxNzM3MTE5MTAxLCJqdGkiOiJBOGgwbWw0VU5vN3dCUnpEIn0.8n-b7apGIM_t7ZTbTSouRiafEAx26QdyK1nIN4qOkzo';
 
-		// const response = await axios.post('https://api.acefone.co.uk/v1/sms/send', {
-		// 	message: 'This is test message',
-		// 	from_number: '15859029632',
-		// 	to_number: req.body.to_number,
-		// 	reference: generateRandomString(16),
-		// }, { headers: { Authorization: `${token}`, "Content-Type": "application/json" } });
+		const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5Nzk2LCJpc3MiOiJodHRwczpcL1wvc2VydmljZS5hY2Vmb25lLmNvLnVrXC90b2tlblwvZ2VuZXJhdGUiLCJpYXQiOjE3MzcxMTkxMDEsImV4cCI6MjAzNzExOTEwMSwibmJmIjoxNzM3MTE5MTAxLCJqdGkiOiJBOGgwbWw0VU5vN3dCUnpEIn0.8n-b7apGIM_t7ZTbTSouRiafEAx26QdyK1nIN4qOkzo';
+
+		await axios.post('https://api.acefone.co.uk/v1/sms/send', {
+			message: 'This is test message',
+			from_number: '27233',
+			to_number: req.body.to_number,
+			reference: generateRandomString(16),
+		}, { headers: { "Authorization": `bearer ${token}`, "Content-Type": "application/json" } });
 
 		const transporter = nodemailer.createTransport({
 			host: "smtp-relay.brevo.com",
@@ -36,7 +38,8 @@ const createQuotation = async (req, res) => {
 
 		const mailOptions = {
 			from: process.env.SMTP_FROM_USER,
-			to: "echintangohil@gmail.com",
+			// to: "echintangohil@gmail.com",
+			to: "meet2vanraj@gmail.com",
 			subject: "Quotation Details",
 			html: `
 			<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -66,7 +69,7 @@ const createQuotation = async (req, res) => {
 						</tr>
 						<tr style="background-color: #f2f2f2;">
 							<th style="text-align: left; padding: 10px; border: 1px solid #ddd;">Discount</th>
-							<td style="padding: 10px; border: 1px solid #ddd;">${req.body.discount}%</td>
+							<td style="padding: 10px; border: 1px solid #ddd;">$${req.body.discount}</td>
 						</tr>
 						<tr>
 							<th style="text-align: left; padding: 10px; border: 1px solid #ddd;">Shipping</th>
@@ -83,7 +86,7 @@ const createQuotation = async (req, res) => {
 					</table>
 					<p>You can make a payment using the following link:</p>
 					<p style="text-align: center; margin: 20px 0;">
-						<a href="https://payment.example.com/pay?quoteId=${req.body.quote_id}" 
+						<a href="https://payment.example.com/pay/${req.body.payment_token}" 
 						   style="background-color: #4CAF50; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
 						   Pay Now
 						</a>
@@ -100,18 +103,10 @@ const createQuotation = async (req, res) => {
 
 		const response = await transporter.sendMail(mailOptions);
 
-		// if (response.status === 200) {
-		// 	res.status(201).json({
-		// 		message: "Quotation created successfully.",
-		// 		data: req.body,
-		// 	});
-		// } else {
-		// 	console.error("Error sending SMS:", response.data);
-		// 	res.status(422).json({
-		// 		message: "Failed to send SMS.",
-		// 		error: response.data,
-		// 	});
-		// }
+		res.status(201).json({
+			message: "Quotation created successfully.",
+			data: req.body,
+		});
 	} catch (error) {
 		console.error("Error creating quotation:", error);
 		res.status(500).json({
@@ -121,6 +116,83 @@ const createQuotation = async (req, res) => {
 	}
 };
 
+const getQuotations = async (req, res) => { 
+	try {
+		const quotations = await Quote.findAll({
+			include: [
+				{
+					model: Agent,
+					as: "agent",
+					attributes: ["firstName", "lastName"],
+				},
+				{
+					model: Lead,
+					as: "lead",
+					attributes: ["name", "phone", "email", "trackingId"],
+				},
+			],
+			order: [['created_at', 'DESC']],
+		});
+
+		const uniqueQuotations = quotations.reduce((acc, current) => {
+			const x = acc.find(item => item.lead_id === current.lead_id);
+			if (!x) {
+				return acc.concat([current]);
+			} else {
+				return acc;
+			}
+		}, []);
+		
+		const formattedQuotations = uniqueQuotations.map((quotation) => ({
+			...quotation.toJSON(),
+			agent: quotation.agent
+				? `${quotation.agent.firstName} ${quotation.agent.lastName}`
+				: null,
+		}));
+
+		res.status(200).send(formattedQuotations);
+	} catch (error) {
+		console.error("Error getting quotations:", error);
+		res.status(500).json({
+			message: "Failed to get quotations.",
+			error: error,
+		});
+	}	
+};
+
+const getQuotationsHistory = async (req, res) => {
+	try {
+		
+		const leads = await Lead.findAll({
+			where: { trackingId: req.body.trackingId },
+		});
+		
+		const leadIds = leads.map(lead => lead.id);
+
+		const quotations = await Quote.findAll({
+			include: [
+				{
+					model: Agent,
+					as: "agent",
+					attributes: ["firstName", "lastName"],
+				}
+			],
+			where: { lead_id: leadIds },
+		});
+
+		const formattedQuotations = quotations.map((quotation) => ({
+			...quotation.toJSON(),
+			agent: quotation.agent
+				? `${quotation.agent.firstName} ${quotation.agent.lastName}`
+				: null,
+		}));
+
+		res.status(200).send(formattedQuotations);
+	} catch (error) {
+		
+	}
+};
+
 module.exports = {
-	createQuotation,
+	createQuotation, getQuotations, getQuotationsHistory
 };

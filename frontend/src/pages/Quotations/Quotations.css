@@ -1,0 +1,38 @@
+.status-cell {
+	/* Ensure this class is added to your td elements in the React component */
+	height: 100%; /* Take full height of cell */
+}
+.status {
+	padding: 6px 10px; /* Slightly increased horizontal padding */
+	font-size: 16px; /* Adjusted font size for readability */
+	border-radius: 4px; /* Rounded corners for aesthetic */
+	display: inline-flex; /* Inline flex to keep the flow inline but enable flex properties */
+	align-items: center; /* Center text inside the status box */
+	justify-content: center; /* Ensure the text is centered within the label */
+	width: fit-content; /* Adjust width to fit the content */
+	margin: 0 auto; /* Center the label within the flex container if there's extra space */
+	font-family: Quando;
+}
+
+.status.pending {
+	background-color: #e3ddff;
+	color: #2600ff; /* Dark text for better contrast */
+	min-width: 100px;
+}
+
+.status.accepted {
+	background-color: #daffdf; /* Light green */
+	color: #3eba00; /* Dark green for readability */
+	min-width: 100px;
+}
+
+.status.declined {
+	background-color: #ffe8e8; /* Light red */
+	color: #d90000; /* Dark red for visibility */
+	min-width: 100px;
+}
+
+/* Main Container Styling */
+.quotation-container {
+	padding: 20px;
+}

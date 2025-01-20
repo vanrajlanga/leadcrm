@@ -9,11 +9,13 @@ import {
 import { IoMdCalendar, IoIosMore } from "react-icons/io";
 import "./LeadsList.css";
 import AddQuotation from "../../components/Quotation/addQuotation";
+import NewAgent from "../../components/Quotation/NewAgent";
 import axios from "axios";
 
 const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 	const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
+	const [newAgentModal, setNewAgentModal] = useState(false);
 	const [selectedLead, setSelectedLead] = useState(null);
 	const [newVendor, setNewVendor] = useState(false);
 	const [vendorData, setVendorData] = useState({
@@ -37,6 +39,11 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 	const openQuotationModal = (lead) => {
 		setSelectedLead(lead);
 		setOpenModal(true);
+	};
+
+	const openNewAgentModal = (lead) => {
+		setSelectedLead(lead);
+		setNewAgentModal(true);
 	};
 
 	// Close the vendor modal
@@ -260,6 +267,12 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 			</table>
 			{openModal && (
 				<AddQuotation
+					closeModal={() => setOpenModal(false)}
+					lead={selectedLead}
+				/>
+			)}
+			{openModal && (
+				<NewAgent
 					closeModal={() => setOpenModal(false)}
 					lead={selectedLead}
 				/>

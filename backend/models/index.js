@@ -61,6 +61,24 @@ User.hasOne(Agent, {
 	},
 });
 
+Quote.belongsTo(Agent, {
+	as: "agent",
+	foreignKey: {
+		name: "agent_id",
+		allowNull: false,
+		index: false,
+	},
+});
+
+Quote.belongsTo(Lead, {
+	as: "lead",
+	foreignKey: {
+		name: "lead_id",
+		allowNull: false,
+		index: false,
+	},
+});
+
 // Lead and Ticket (One-to-Many)
 Ticket.belongsTo(Lead, {
 	as: "lead",
@@ -72,6 +90,11 @@ Ticket.belongsTo(Lead, {
 });
 Lead.hasMany(Ticket, {
 	as: "tickets",
+	foreignKey: "lead_id",
+});
+
+Lead.hasMany(Quote, {
+	as: "quote",
 	foreignKey: "lead_id",
 });
 
@@ -91,6 +114,15 @@ Agent.hasMany(Lead, {
 		index: false,
 	},
 	as: "leads",
+});
+
+Agent.hasMany(Quote, {
+	foreignKey: {
+		name: "agent_id",
+		allowNull: false,
+		index: false,
+	},
+	as: "quotes",
 });
 
 // Sync models with the database

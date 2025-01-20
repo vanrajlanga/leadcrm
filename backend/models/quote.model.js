@@ -30,6 +30,10 @@ const Quote = sequelize.define(
 			type: DataTypes.TEXT,
 			allowNull: false,
 		},
+		payment_token: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
 		selling_price: {
 			type: DataTypes.DECIMAL(10, 2),
 			defaultValue: 0.0,
