@@ -76,7 +76,7 @@ const Lead = sequelize.define(
 			allowNull: true,
 		},
 		status: {
-			type: DataTypes.ENUM("Pending", "Follow Up", "Converted", "Rejected"),
+			type: DataTypes.ENUM("Pending", "Follow Up", "Converted", "Rejected", "Forwarded"),
 			defaultValue: "Pending",
 		},
 	},

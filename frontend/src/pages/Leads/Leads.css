@@ -78,7 +78,7 @@ button:hover {
 	min-width: 100px;
 }
 
-.status.rejected {
+.status.rejected, .status.forwarded {
 	background-color: #ffe8e8; /* Light red */
 	color: #d90000; /* Dark red for visibility */
 	min-width: 100px;

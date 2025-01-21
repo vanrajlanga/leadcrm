@@ -80,6 +80,10 @@ const Leads = () => {
 		}
 	};
 
+	const refreshLeads = async () => {
+		fetchLeads();
+	};
+
 	useEffect(() => {
 		fetchLeads();
 		fetchVendors();
@@ -95,6 +99,7 @@ const Leads = () => {
 				vendors={vendors}
 				onAddVendor={onAddVendor}
 				onSaveCostPrice={onSaveCostPrice}
+				refreshLeads={refreshLeads}
 			/>
 		</div>
 	);

@@ -11,8 +11,9 @@ import "./LeadsList.css";
 import AddQuotation from "../../components/Quotation/addQuotation";
 import NewAgent from "../../components/Quotation/NewAgent";
 import axios from "axios";
+import { PiUserSwitchBold } from "react-icons/pi";
 
-const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
+const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshLeads }) => {
 	const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [newAgentModal, setNewAgentModal] = useState(false);
@@ -254,10 +255,15 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 								</button>
 							</td>
 							<td>
-								<button
-									className="action-btn"
-									onClick={() => handleHangup(lead.call_id)}
-								>
+								{lead.status !== "Forwarded" && (
+									<button 
+										className="action-btn"
+										onClick={() => openNewAgentModal(lead)}
+									>
+										<PiUserSwitchBold />
+									</button>
+								)}
+								<button className="action-btn">
 									<IoIosMore />
 								</button>
 							</td>
@@ -271,10 +277,11 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor }) => {
 					lead={selectedLead}
 				/>
 			)}
-			{openModal && (
+			{newAgentModal && (
 				<NewAgent
-					closeModal={() => setOpenModal(false)}
+					closeModal={() => setNewAgentModal(false)}
 					lead={selectedLead}
+					refreshLeads={() => refreshLeads()}
 				/>
 			)}
 

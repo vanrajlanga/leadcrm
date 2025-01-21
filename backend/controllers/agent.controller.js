@@ -1,4 +1,4 @@
-const { Agent, User, UserRole } = require("../models");
+const { Agent, User, UserRole, Lead } = require("../models");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -9,6 +9,7 @@ const {
 	PutObjectCommand,
 	DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
+const { Op } = require("sequelize");
 
 // Configure AWS S3 Client
 const s3Client =
@@ -156,6 +157,29 @@ const getAgents = async (req, res) => {
 	}
 };
 
+const getAgentsByName = async (req, res) => {
+	try {
+		const agents = await Agent.findAll({
+			include: [
+				{
+					model: User,
+					as: "user",
+				},
+			],
+			where: {
+				[Op.or]: [
+					{ firstName: { [Op.like]: `%${req.body.name}%` } },
+					{ lastName: { [Op.like]: `%${req.body.name}%` } },
+				],
+			},
+		});
+		res.status(200).send(agents);
+	} catch (error) {
+		console.error("Error fetching agents:", error);
+		res.status(500).send({ error: "Failed to fetch agents" });
+	}
+};
+
 // Read a single agent
 const getAgentById = async (req, res) => {
 	try {
@@ -236,10 +260,44 @@ const deleteAgent = async (req, res) => {
 	}
 };
 
+const assignNewAgent = async (req, res) => {
+	try {
+		if(req.body.lead_id == null || req.body.new_agent_id == null) {
+			return res.status(400).send({ error: "Lead ID and Agent ID are required" });
+		}
+
+		const lead = await Lead.findByPk(req.body.lead_id, {
+			attributes: { exclude: ['id', 'agent_id'] }
+		});
+
+		if (!lead) {
+			return res.status(404).send({ error: "Lead not found" });
+		}
+		
+		const newLeadData = {
+			...lead.toJSON(),
+			agent_id: req.body.new_agent_id,
+		};
+
+		const newLead = await Lead.create(newLeadData);
+
+		const leadUpdate = await Lead.findByPk(req.body.lead_id);
+		await leadUpdate.update({ status: 'Forwarded' });
+
+		res.status(201).send(newLead);
+	} catch (error) {
+		console.error("Error assigning new agent:", error);
+		res.status(500).send({ error: "Failed to assign new agent" });
+		
+	}
+};
+
 module.exports = {
 	createAgents,
 	getAgents,
+	getAgentsByName,
 	getAgentById,
 	updateAgent,
 	deleteAgent,
+	assignNewAgent,
 };

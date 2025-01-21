@@ -4,15 +4,18 @@ const { roles } = require("../controllers/role.controller");
 const {
 	createAgents,
 	getAgents,
+	getAgentsByName,
 	getAgentById,
 	updateAgent,
 	deleteAgent,
+	assignNewAgent,
 } = require("../controllers/agent.controller");
 
 const {
 	createLead,
 	getAllLeads,
 	getLeadById,
+	getLeadByTrackingId,
 	updateLead,
 	deleteLead,
 } = require("../controllers/lead.controller");
@@ -61,14 +64,17 @@ router.get("/roles", roles);
 // Agent Routes
 router.post("/create-agent", authenticate, createAgents);
 router.post("/get-agents", authenticate, getAgents);
+router.post("/get-agents-by-name", authenticate, getAgentsByName);
 router.post("/get-agent", authenticate, getAgentById);
 router.post("/update-agent", authenticate, updateAgent);
 router.post("/delete-agent", authenticate, deleteAgent);
+router.post("/asign-new-agent", authenticate, assignNewAgent);
 
 // Lead Routes
 router.post("/create-lead", authenticate, createLead);
 router.post("/get-leads", authenticate, getAllLeads);
 router.post("/get-lead", authenticate, getLeadById);
+router.post("/get-leads-history-by-trackingId", authenticate, getLeadByTrackingId);
 router.post("/update-lead", authenticate, updateLead);
 router.post("/delete-lead", authenticate, deleteLead);
 

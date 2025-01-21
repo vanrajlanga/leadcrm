@@ -1,69 +1,133 @@
-body {
-    font-family: Arial, sans-serif;
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f5f5f5;
+    z-index: 1000;
   }
-  .modal {
-    background: #fff;
+  
+  /* Modal Container */
+  .modal-container {
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 40%;
     padding: 20px;
-    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
   }
-  .modal h3 {
-    margin: 0 0 20px;
-    font-size: 18px;
+  
+  /* Modal Header */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
   }
-  .modal .close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #000;
+  
+  .modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  /* Close Button */
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
     cursor: pointer;
+    color: #333;
   }
-  .modal input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
+  
+  /* Modal Body */
+  .modal-body {
+    padding: 20px 0;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
+    padding: 10px;
+    font-size: 1rem;
+    outline: none;
   }
-  .modal button {
-    padding: 10px 15px;
-    font-size: 14px;
+  
+  textarea {
+    resize: none;
+    height: 100px;
+  }
+  
+  /* Modal Footer */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .form-group-container {
+    display: -webkit-box;
+  }
+
+  .product-name, .discount {
+    width: 48%;
+    margin-right: 7%;
+  }
+  
+  .selling-price, .voucher-code {
+    width: 45%;
+    float: right;
+  }
+
+  .form-group.product-price, .form-group.shipping {
+    width: 30%;
+    margin-right: 3%;
+  }
+
+  .form-group.tax {
+    width: 33%;
+  }
+
+  .send-button {
+    background: black;
+    color: white;
+    padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 5px 0;
+    font-size: 1rem;
   }
-  .modal .add-btn {
-    background-color: #000;
-    color: #fff;
+  
+  .send-button:hover {
+    background: #333;
   }
-  .modal .submit-btn {
-    background-color: #000;
-    color: #fff;
-    width: 100%;
-  }
-  .modal .history {
-    margin-top: 20px;
-    font-size: 14px;
-  }
-  .modal .history ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .modal .history li {
+  
+  .agent-list {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
     display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
+  }
+
+  .agent-item {
+    margin: 5px;
+    background: darkgrey;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
   }

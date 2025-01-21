@@ -117,6 +117,32 @@ const getLeadById = async (req, res) => {
 	}
 };
 
+const getLeadByTrackingId = async (req, res) => {
+	try {
+		const lead = await Lead.findAll({
+			include: [
+				{
+					model: Agent,
+					as: "agent",
+					attributes: ["firstName", "lastName"],
+				},
+			],
+			where: {
+				trackingId: req.body.trackingId,
+			},
+		});
+
+		if (!lead) {
+			return res.status(404).send({ error: "Lead not found" });
+		}
+
+		res.status(200).send(lead);
+	} catch (error) {
+		console.error("Error fetching lead:", error);
+		res.status(500).send({ error: "Failed to fetch lead" });
+	}
+};
+
 // Update a lead
 const updateLead = async (req, res) => {
 	upload.single("recordAudio")(req, res, async (err) => {
@@ -206,6 +232,7 @@ module.exports = {
 	createLead,
 	getAllLeads,
 	getLeadById,
+	getLeadByTrackingId,
 	updateLead,
 	deleteLead,
 };
