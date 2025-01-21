@@ -16,7 +16,7 @@ const AppRoutes = () => {
 	return (
 		<Router>
 			<Routes>
-				<Route path="/payment" element={<Payment />} />
+				<Route path="/pay/:payment_token" element={<Payment />} />
 				{/* Authentication Routes */}
 				{!isAuthenticated && (
 					<Route

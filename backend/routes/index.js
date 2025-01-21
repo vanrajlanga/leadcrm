@@ -28,16 +28,16 @@ const {
 	deleteVendor,
 } = require("../controllers/vendor.controller");
 
-const { 
-	createQuotation, 
-	getQuotations, 
-	getQuotationsHistory 
+const {
+	createQuotation,
+	getQuotations,
+	getQuotationsHistory,
 } = require("../controllers/quotation.controller");
 
 const {
 	initiateCall,
-	hangupCall,
 	fetchCallRecordings,
+	getPaymentAmount,
 } = require("../controllers/master.controller");
 
 const {
@@ -87,14 +87,13 @@ router.post("/delete-vendor", authenticate, deleteVendor);
 
 // Master Routes
 router.post("/click-to-call", authenticate, initiateCall);
-router.post("/hangup-call", authenticate, hangupCall);
 router.get("/fetch-call-recording", fetchCallRecordings);
+router.post("/get-payment-amount", getPaymentAmount);
 
 // Quotation Routes
 router.post("/create-quotations", authenticate, createQuotation);
 router.post("/get-quotations", authenticate, getQuotations);
 router.post("/get-quotations-history", authenticate, getQuotationsHistory);
-
 
 // Stripe Routes
 router.post("/create-stripe-payment-intent", createStripePaymentIntent);

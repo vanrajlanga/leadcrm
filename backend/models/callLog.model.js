@@ -71,16 +71,6 @@ const manageIndexes = async () => {
 			console.log("Index agent_id_index already exists for CallLogs.");
 		}
 
-		// Check and add index for `call_status`
-		if (!indexes.some((index) => index.name === "call_status_index")) {
-			await queryInterface.addIndex("CallLogs", ["call_status"], {
-				name: "call_status_index",
-			});
-			console.log("Index call_status_index added for CallLogs.");
-		} else {
-			console.log("Index call_status_index already exists for CallLogs.");
-		}
-
 		// Check and add index for `destination_number`
 		if (!indexes.some((index) => index.name === "destination_number_index")) {
 			await queryInterface.addIndex("CallLogs", ["destination_number"], {

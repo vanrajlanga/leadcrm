@@ -36,10 +36,6 @@ const Lead = sequelize.define(
 		states: {
 			type: DataTypes.STRING,
 		},
-		subscription: {
-			type: DataTypes.BOOLEAN,
-			defaultValue: false,
-		},
 		trackingId: {
 			type: DataTypes.STRING,
 		},

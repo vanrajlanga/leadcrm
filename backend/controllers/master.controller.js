@@ -1,6 +1,6 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const axios = require("axios");
-const CallLog = require("../models/callLog.model");
+const { CallLog, Quote } = require("../models");
 const { Op } = require("sequelize");
 
 // Acefone Token Variables
@@ -81,10 +81,7 @@ const initiateCall = async (req, res) => {
 		const newLog = await CallLog.create({
 			lead_id,
 			agent_id,
-			call_id: response.data.call_id,
-			call_status: "initiated",
 			destination_number,
-			start_time: new Date(),
 		});
 
 		res.status(200).json({
@@ -100,58 +97,15 @@ const initiateCall = async (req, res) => {
 	}
 };
 
-// Hangup Call
-const hangupCall = async (req, res) => {
-	const { call_id } = req.body;
-
-	if (!call_id) {
-		return res.status(400).json({
-			success: false,
-			message: "Missing required field: call_id",
-		});
-	}
-
-	try {
-		// Make API call to hang up
-		const token = await getAcefoneToken();
-		await axios.post(
-			"https://api.acefone.co.uk/v1/call/hangup",
-			{ call_id },
-			{
-				headers: {
-					Authorization: `Bearer ${token}`,
-					"Content-Type": "application/json",
-				},
-			}
-		);
-
-		// Update log
-		const log = await CallLog.findOne({ where: { call_id } });
-		if (log) {
-			log.call_status = "completed";
-			log.end_time = new Date();
-			log.duration = Math.floor((new Date() - log.start_time) / 1000); // Calculate duration in seconds
-			await log.save();
-		}
-
-		res
-			.status(200)
-			.json({ success: true, message: "Call successfully hung up" });
-	} catch (error) {
-		console.error("Error hanging up the call:", error.message);
-		res.status(500).json({ success: false, message: "Failed to hang up call" });
-	}
-};
-
 // Fetch Call Recordings and Upload to S3
-const fetchCallRecordings = async (req, res) => {
+const fetchCallRecordings = async () => {
 	try {
-		// Generate token and make API call
+		console.log("Starting cron job to fetch call recordings...");
 		const token = await getAcefoneToken();
 
-		// Fetch recordings from Acefone
+		// Fetch call report from Acefone
 		const response = await axios.get(
-			"https://api.acefone.co.uk/v1/recordings",
+			"https://api.acefone.co.uk/v1/call_report",
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -159,56 +113,98 @@ const fetchCallRecordings = async (req, res) => {
 				},
 			}
 		);
-		console.log("response", response);
-		const recordings = response.data.recordings; // Adjust based on API response structure
-		if (!recordings || recordings.length === 0) {
-			return res.status(200).json({
-				success: true,
-				message: "No recordings found.",
-			});
+
+		const callData = response.data.data;
+		if (!callData || callData.length === 0) {
+			console.log("No call data found.");
+			return;
 		}
 
-		// Process each recording
-		for (const recording of recordings) {
-			// Download the recording file
-			const recordingResponse = await axios.get(recording.url, {
-				responseType: "arraybuffer",
-			});
+		for (const call of callData) {
+			const { id, recording_file_link } = call;
+			if (recording_file_link) {
+				// Download the recording file
+				const recordingResponse = await axios.get(recording_file_link, {
+					responseType: "arraybuffer",
+				});
 
-			// Prepare the S3 upload command
-			const fileName = `recordings/${recording.call_id}_${Date.now()}.mp3`; // Customize file naming
-			const uploadParams = {
-				Bucket: process.env.AWS_S3_BUCKET_NAME,
-				Key: fileName,
-				Body: recordingResponse.data,
-				ContentType: "audio/mpeg",
-			};
+				// Prepare the S3 upload command
+				const fileName = `recordings/${call.source}_${Date.now()}.mp3`;
+				console.log("fileName", fileName);
+				console.log("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
+				const uploadParams = {
+					Bucket: process.env.AWS_BUCKET_NAME,
+					Key: fileName,
+					Body: recordingResponse.data,
+					ContentType: "audio/mpeg",
+				};
 
-			// Upload to S3
-			await s3Client.send(new PutObjectCommand(uploadParams));
+				// Upload to S3
+				const data = await s3Client.send(new PutObjectCommand(uploadParams));
+				if (data.$metadata.httpStatusCode === 200) {
+					console.log(`File uploaded successfully: ${fileName}`);
+				} else {
+					console.error(`Failed to upload file: ${fileName}`);
+				}
 
-			// Update CallLog with S3 URL
-			await CallLog.update(
-				{ recording_url: `s3://${process.env.AWS_S3_BUCKET_NAME}/${fileName}` },
-				{ where: { call_id: recording.call_id } }
-			);
+				// Update CallLog with S3 URL
+				await CallLog.update(
+					{
+						recording_url: `s3://${process.env.AWS_BUCKET_NAME}/${fileName}`,
+					},
+					{
+						where: {
+							destination_number: call.destination,
+							[Op.and]: Sequelize.where(fn("DATE", col("createdAt")), date),
+						},
+					}
+				);
+				console.log(`Recording for call ID ${id} uploaded successfully.`);
+			} else {
+				console.log(`No recording available for call ID: ${id}`);
+			}
 		}
 
-		res.status(200).json({
-			success: true,
-			message: "Recordings fetched and uploaded to S3 successfully.",
-		});
+		console.log("Call recordings processed successfully.");
 	} catch (error) {
-		console.error("Error fetching and uploading recordings:", error.message);
+		console.error("Error in fetching and uploading recordings:", error.message);
+	}
+};
+
+const getPaymentAmount = async (req, res) => {
+	const payment_token = req.body.payment_token;
+
+	if (!payment_token) {
+		return res.status(400).json({
+			success: false,
+			message: "Missing required field: payment_token",
+		});
+	}
+
+	try {
+		const quote = await Quote.findOne({
+			where: { payment_token },
+		});
+
+		if (!quote) {
+			return res.status(404).json({
+				success: false,
+				message: "Quote not found",
+			});
+		}
+
+		res.status(200).json(quote);
+	} catch (error) {
+		console.error("Error fetching quote:", error.message);
 		res.status(500).json({
 			success: false,
-			message: "Failed to fetch and upload recordings.",
+			message: "Failed to fetch quote",
 		});
 	}
 };
 
 module.exports = {
 	initiateCall,
-	hangupCall,
 	fetchCallRecordings,
+	getPaymentAmount,
 };

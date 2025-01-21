@@ -1,4 +1,4 @@
-const { Quote,Agent,Lead } = require("../models");
+const { Quote, Agent, Lead } = require("../models");
 const axios = require("axios");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
@@ -6,25 +6,33 @@ const nodemailer = require("nodemailer");
 // Create a new vendor
 const createQuotation = async (req, res) => {
 	try {
-
 		const generateRandomString = (length) => {
 			return crypto.randomBytes(length).toString("hex").slice(0, length);
 		};
-		
+
 		req.body.payment_token = generateRandomString(16);
 		const newQuotation = await Quote.create({
 			...req.body,
 		});
 
+		const token =
+			"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5Nzk2LCJpc3MiOiJodHRwczpcL1wvc2VydmljZS5hY2Vmb25lLmNvLnVrXC90b2tlblwvZ2VuZXJhdGUiLCJpYXQiOjE3MzcxMTkxMDEsImV4cCI6MjAzNzExOTEwMSwibmJmIjoxNzM3MTE5MTAxLCJqdGkiOiJBOGgwbWw0VU5vN3dCUnpEIn0.8n-b7apGIM_t7ZTbTSouRiafEAx26QdyK1nIN4qOkzo";
 
-		const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5Nzk2LCJpc3MiOiJodHRwczpcL1wvc2VydmljZS5hY2Vmb25lLmNvLnVrXC90b2tlblwvZ2VuZXJhdGUiLCJpYXQiOjE3MzcxMTkxMDEsImV4cCI6MjAzNzExOTEwMSwibmJmIjoxNzM3MTE5MTAxLCJqdGkiOiJBOGgwbWw0VU5vN3dCUnpEIn0.8n-b7apGIM_t7ZTbTSouRiafEAx26QdyK1nIN4qOkzo';
-
-		await axios.post('https://api.acefone.co.uk/v1/sms/send', {
-			message: 'This is test message',
-			from_number: '27233',
-			to_number: req.body.to_number,
-			reference: generateRandomString(16),
-		}, { headers: { "Authorization": `bearer ${token}`, "Content-Type": "application/json" } });
+		await axios.post(
+			"https://api.acefone.co.uk/v1/sms/send",
+			{
+				message: "This is test message",
+				from_number: "27233",
+				to_number: req.body.to_number,
+				reference: generateRandomString(16),
+			},
+			{
+				headers: {
+					Authorization: `bearer ${token}`,
+					"Content-Type": "application/json",
+				},
+			}
+		);
 
 		const transporter = nodemailer.createTransport({
 			host: "smtp-relay.brevo.com",
@@ -38,8 +46,8 @@ const createQuotation = async (req, res) => {
 
 		const mailOptions = {
 			from: process.env.SMTP_FROM_USER,
-			// to: "echintangohil@gmail.com",
-			to: "meet2vanraj@gmail.com",
+			to: "echintangohil@gmail.com",
+			// to: "meet2vanraj@gmail.com",
 			subject: "Quotation Details",
 			html: `
 			<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -86,7 +94,7 @@ const createQuotation = async (req, res) => {
 					</table>
 					<p>You can make a payment using the following link:</p>
 					<p style="text-align: center; margin: 20px 0;">
-						<a href="https://payment.example.com/pay/${req.body.payment_token}" 
+						<a href="${process.env.FRONTEND_URL}/pay/${req.body.payment_token}" 
 						   style="background-color: #4CAF50; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
 						   Pay Now
 						</a>
@@ -116,7 +124,7 @@ const createQuotation = async (req, res) => {
 	}
 };
 
-const getQuotations = async (req, res) => { 
+const getQuotations = async (req, res) => {
 	try {
 		const quotations = await Quote.findAll({
 			include: [
@@ -131,18 +139,18 @@ const getQuotations = async (req, res) => {
 					attributes: ["name", "phone", "email", "trackingId"],
 				},
 			],
-			order: [['created_at', 'DESC']],
+			order: [["created_at", "DESC"]],
 		});
 
 		const uniqueQuotations = quotations.reduce((acc, current) => {
-			const x = acc.find(item => item.lead_id === current.lead_id);
+			const x = acc.find((item) => item.lead_id === current.lead_id);
 			if (!x) {
 				return acc.concat([current]);
 			} else {
 				return acc;
 			}
 		}, []);
-		
+
 		const formattedQuotations = uniqueQuotations.map((quotation) => ({
 			...quotation.toJSON(),
 			agent: quotation.agent
@@ -157,17 +165,16 @@ const getQuotations = async (req, res) => {
 			message: "Failed to get quotations.",
 			error: error,
 		});
-	}	
+	}
 };
 
 const getQuotationsHistory = async (req, res) => {
 	try {
-		
 		const leads = await Lead.findAll({
 			where: { trackingId: req.body.trackingId },
 		});
-		
-		const leadIds = leads.map(lead => lead.id);
+
+		const leadIds = leads.map((lead) => lead.id);
 
 		const quotations = await Quote.findAll({
 			include: [
@@ -175,7 +182,7 @@ const getQuotationsHistory = async (req, res) => {
 					model: Agent,
 					as: "agent",
 					attributes: ["firstName", "lastName"],
-				}
+				},
 			],
 			where: { lead_id: leadIds },
 		});
@@ -188,11 +195,11 @@ const getQuotationsHistory = async (req, res) => {
 		}));
 
 		res.status(200).send(formattedQuotations);
-	} catch (error) {
-		
-	}
+	} catch (error) {}
 };
 
 module.exports = {
-	createQuotation, getQuotations, getQuotationsHistory
+	createQuotation,
+	getQuotations,
+	getQuotationsHistory,
 };
