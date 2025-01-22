@@ -24,6 +24,29 @@ const upload = multer({
 	storage: multer.memoryStorage(),
 });
 
+// Assign agent according to round robin
+const assignAgent = async () => {
+	const agents = await Agent.findAll({ attributes: ["id"] });
+	if (agents.length === 0) {
+		throw new Error("No agents available");
+	}
+
+	const lastLead = await Lead.findOne({
+		order: [["createdAt", "DESC"]],
+		attributes: ["agent_id"],
+	});
+
+	let nextAgentIndex = 0;
+	if (lastLead && lastLead.agent_id) {
+		const lastAgentIndex = agents.findIndex(
+			(agent) => agent.id === lastLead.agent_id
+		);
+		nextAgentIndex = (lastAgentIndex + 1) % agents.length;
+	}
+
+	return agents[nextAgentIndex].id;
+};
+
 // Create a new lead
 const createLead = async (req, res) => {
 	upload.single("recordAudio")(req, res, async (err) => {
@@ -40,7 +63,7 @@ const createLead = async (req, res) => {
 			if (s3Client && process.env.AWS_BUCKET_NAME) {
 				const uploadToS3 = async (fileBuffer, filename) => {
 					const datetime = moment().format("MM-DD-YYYY-hh-mm-ss");
-					const key = `${filename}-${datetime}`;
+					const key = `leadRecordAudio/${filename}-${datetime}`;
 					const uploadParams = {
 						Bucket: process.env.AWS_BUCKET_NAME,
 						Key: key,
@@ -56,6 +79,30 @@ const createLead = async (req, res) => {
 					recordAudioUrl = await uploadToS3(req.file.buffer, "record-audio");
 				}
 			}
+
+			// Generate trackingId
+			const generateTrackingId = async () => {
+				const lastLead = await Lead.findOne({
+					order: [["createdAt", "DESC"]],
+					attributes: ["trackingId"],
+				});
+
+				if (!lastLead || !lastLead.trackingId) {
+					return "TR000001";
+				}
+
+				const lastTrackingId = lastLead.trackingId;
+				const numericPart = parseInt(lastTrackingId.slice(2), 10);
+				const newTrackingId = `TR${String(numericPart + 1).padStart(6, "0")}`;
+
+				return newTrackingId;
+			};
+
+			const agentId = await assignAgent();
+			req.body.agent_id = agentId;
+
+			const trackingId = await generateTrackingId();
+			req.body.trackingId = trackingId;
 
 			// Create the lead
 			const newLead = await Lead.create({

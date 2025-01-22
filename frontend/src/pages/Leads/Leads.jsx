@@ -51,6 +51,7 @@ const Leads = () => {
 	// Add Lead function
 	const onAddLead = async (leadData) => {
 		try {
+			leadData.source = "Manual";
 			await axios.post(`${API_URL}/create-lead`, leadData, {
 				headers: { Authorization: `Bearer ${token}` },
 			});

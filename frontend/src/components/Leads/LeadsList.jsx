@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { AiOutlineEye } from "react-icons/ai";
-import {
-	MdPerson,
-	MdOutlinePhone,
-	MdOutlineEmail,
-	MdCallEnd,
-} from "react-icons/md";
+import { MdOutlinePhone, MdOutlineEmail } from "react-icons/md";
 import { IoMdCalendar, IoIosMore } from "react-icons/io";
 import "./LeadsList.css";
 import AddQuotation from "../../components/Quotation/addQuotation";
@@ -13,7 +8,13 @@ import NewAgent from "../../components/Quotation/NewAgent";
 import axios from "axios";
 import { PiUserSwitchBold } from "react-icons/pi";
 
-const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshLeads }) => {
+const LeadsList = ({
+	leads,
+	vendors = [],
+	onSaveCostPrice,
+	onAddVendor,
+	refreshLeads,
+}) => {
 	const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [newAgentModal, setNewAgentModal] = useState(false);
@@ -137,28 +138,6 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshL
 		}
 	};
 
-	// Trigger Acefone API to hang up a call
-	const handleHangup = async (callId) => {
-		try {
-			const response = await axios.post(
-				`${API_URL}/hangup-call`,
-				{ call_id: callId },
-				{
-					headers: { Authorization: `Bearer ${token}` },
-				}
-			);
-
-			if (response.data.success) {
-				alert("Call successfully hung up.");
-			} else {
-				alert(`Failed to hang up call: ${response.data.message}`);
-			}
-		} catch (error) {
-			console.error("Error hanging up the call:", error);
-			alert("Error hanging up the call. Please try again.");
-		}
-	};
-
 	// Utility function to get color based on status
 	const getStatusColor = (status) => {
 		switch (status) {
@@ -190,7 +169,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshL
 						<th>CATEGORY</th>
 						<th>C.P</th>
 						<th>S.P</th>
-						<th>Reference By</th>
+						<th>Source</th>
 						<th>Agent</th>
 						<th>Follow Up Date</th>
 						<th>Status</th>
@@ -210,10 +189,6 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshL
 									onClick={() => handleCall(lead)}
 								/>{" "}
 								{lead.phone}
-								<MdCallEnd
-									className="phone-btn"
-									onClick={() => handleHangup(lead.call_id)}
-								/>
 							</td>
 							<td>
 								<MdOutlineEmail className="email-btn" /> {lead.email}
@@ -231,10 +206,12 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshL
 								{lead.cost_price || "---"}
 							</td>
 							<td>{lead.selling_price || "---"}</td>
-							<td>{lead.reference}</td>
+							<td>{lead.source}</td>
 							<td>{lead.agent}</td>
 							<td style={{ color: getStatusColor(lead.status) }}>
-								{new Date(lead.followup_date).toLocaleDateString("en-GB")}
+								{lead.followup_date
+									? new Date(lead.followup_date).toLocaleDateString("en-GB")
+									: "---"}
 							</td>
 							<td className="status-cell">
 								<div className={`status ${getStatusClassName(lead.status)}`}>
@@ -256,7 +233,7 @@ const LeadsList = ({ leads, vendors = [], onSaveCostPrice, onAddVendor, refreshL
 							</td>
 							<td>
 								{lead.status !== "Forwarded" && (
-									<button 
+									<button
 										className="action-btn"
 										onClick={() => openNewAgentModal(lead)}
 									>

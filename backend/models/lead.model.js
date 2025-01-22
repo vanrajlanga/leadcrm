@@ -39,9 +39,6 @@ const Lead = sequelize.define(
 		trackingId: {
 			type: DataTypes.STRING,
 		},
-		eventTimestamp: {
-			type: DataTypes.DATE,
-		},
 		recordAudio: {
 			type: DataTypes.STRING, // Stores the S3 URL of the uploaded audio file
 			allowNull: true,
@@ -54,8 +51,8 @@ const Lead = sequelize.define(
 			type: DataTypes.DECIMAL(10, 2),
 			allowNull: true,
 		},
-		reference: {
-			type: DataTypes.ENUM("website", "manual"),
+		source: {
+			type: DataTypes.ENUM("Website", "Manual"),
 			allowNull: true,
 		},
 		agent_id: {
@@ -72,7 +69,13 @@ const Lead = sequelize.define(
 			allowNull: true,
 		},
 		status: {
-			type: DataTypes.ENUM("Pending", "Follow Up", "Converted", "Rejected", "Forwarded"),
+			type: DataTypes.ENUM(
+				"Pending",
+				"Follow Up",
+				"Converted",
+				"Rejected",
+				"Forwarded"
+			),
 			defaultValue: "Pending",
 		},
 	},

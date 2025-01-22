@@ -38,7 +38,6 @@ const fetchCallRecordings = async () => {
 
 		for (const call of callData) {
 			const { id, recording_file_link } = call;
-
 			if (recording_file_link) {
 				// Download the recording file
 				const recordingResponse = await axios.get(recording_file_link, {
@@ -46,25 +45,32 @@ const fetchCallRecordings = async () => {
 				});
 
 				// Prepare the S3 upload command
-				const fileName = `recordings/${id}_${Date.now()}.mp3`;
+				const fileName = `recordings/${call.source}_${Date.now()}.mp3`;
+				console.log("fileName", fileName);
+				console.log("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
 				const uploadParams = {
-					Bucket: process.env.AWS_S3_BUCKET_NAME,
+					Bucket: process.env.AWS_BUCKET_NAME,
 					Key: fileName,
 					Body: recordingResponse.data,
 					ContentType: "audio/mpeg",
 				};
 
 				// Upload to S3
-				await s3Client.send(new PutObjectCommand(uploadParams));
+				const data = await s3Client.send(new PutObjectCommand(uploadParams));
+				if (data.$metadata.httpStatusCode === 200) {
+					console.log(`File uploaded successfully: ${fileName}`);
+				} else {
+					console.error(`Failed to upload file: ${fileName}`);
+				}
 
 				// Update CallLog with S3 URL
 				await CallLog.update(
 					{
-						recording_url: `s3://${process.env.AWS_S3_BUCKET_NAME}/${fileName}`,
+						recording_url: `s3://${process.env.AWS_BUCKET_NAME}/${fileName}`,
 					},
 					{
 						where: {
-							destination_number: destination,
+							destination_number: call.destination,
 							[Op.and]: Sequelize.where(fn("DATE", col("createdAt")), date),
 						},
 					}
