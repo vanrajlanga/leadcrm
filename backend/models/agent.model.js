@@ -13,6 +13,10 @@ const Agent = sequelize.define(
 			type: DataTypes.BIGINT,
 			allowNull: false,
 		},
+		displayName: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
 		firstName: {
 			type: DataTypes.STRING,
 			allowNull: false,

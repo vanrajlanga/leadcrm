@@ -1,63 +1,84 @@
 .payment-container {
-	max-width: 600px;
+	max-width: 700px;
 	margin: 50px auto;
 	padding: 30px;
 	background-color: #ffffff;
-	border-radius: 10px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	border-radius: 12px;
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 	font-family: "Arial", sans-serif;
+	line-height: 1.6;
 }
 
 .payment-header {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 20px;
+	margin-bottom: 30px;
+	border-bottom: 2px solid #e9ecef;
+	padding-bottom: 10px;
 }
 
 .company-logo {
 	width: 50%;
-	height: 100%;
-	margin-right: 10px;
+	height: auto;
 }
 
 .company-name {
 	font-size: 24px;
 	font-weight: bold;
 	color: #333;
+	text-transform: uppercase;
 }
 
 .payment-title {
 	text-align: center;
-	margin-bottom: 25px;
+	margin: 20px 0;
 	color: #007bff;
 	font-size: 28px;
-	font-weight: 600;
+	font-weight: 700;
 }
 
 .checkout-summary {
-	background-color: #f8f9fa;
 	padding: 20px;
 	border-radius: 8px;
-	margin-bottom: 20px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	margin-bottom: 30px;
 	font-size: 16px;
+	background: #f8f9fa;
+	border: 1px solid #dee2e6;
 }
 
 .checkout-summary h3 {
 	margin-bottom: 15px;
+	color: #495057;
+	text-transform: uppercase;
+	font-size: 20px;
+}
+
+.checkout-summary table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 10px;
+}
+
+.checkout-summary table th,
+.checkout-summary table td {
+	border: 1px solid #dee2e6;
+	padding: 12px;
+	text-align: left;
+}
+
+.checkout-summary table th {
+	background-color: #f1f1f1;
+	font-weight: bold;
 	color: #333;
 }
 
-.checkout-summary p {
-	margin: 8px 0;
-	color: #555;
-}
-
 .total-price {
-	font-size: 18px;
+	font-size: 20px;
 	color: #000;
 	font-weight: bold;
+	text-align: right;
+	margin-top: 15px;
 }
 
 .payment-methods {
@@ -67,7 +88,7 @@
 }
 
 .payment-option {
-	font-size: 18px;
+	font-size: 16px;
 	color: #555;
 	cursor: pointer;
 }
@@ -81,8 +102,8 @@
 }
 
 .card-element {
-	padding: 10px;
-	border: 1px solid #ccc;
+	padding: 12px;
+	border: 1px solid #ced4da;
 	border-radius: 4px;
 	background-color: #f9f9f9;
 	font-size: 16px;
@@ -90,24 +111,25 @@
 
 .payment-button {
 	width: 100%;
-	padding: 12px;
+	padding: 14px;
 	background-color: #007bff;
 	color: white;
-	font-size: 16px;
+	font-size: 18px;
 	font-weight: bold;
 	border: none;
-	border-radius: 6px;
+	border-radius: 8px;
 	cursor: pointer;
-	transition: background-color 0.3s ease;
+	transition: background-color 0.3s ease, transform 0.2s;
 }
 
 .payment-button:hover {
 	background-color: #0056b3;
+	transform: translateY(-2px);
 }
 
 .payment-message {
 	margin-top: 20px;
-	padding: 12px;
+	padding: 14px;
 	border-radius: 6px;
 	text-align: center;
 	font-size: 16px;
@@ -121,4 +143,28 @@
 .payment-message.error {
 	background-color: #f8d7da;
 	color: #721c24;
+}
+.summary-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 10px;
+	font-size: 16px;
+}
+
+.summary-table td {
+	padding: 10px;
+	border: 1px solid #dee2e6;
+	vertical-align: top;
+}
+
+.summary-table td:first-child {
+	font-weight: bold;
+	color: #333;
+	width: 50%; /* Adjust width as needed */
+	text-align: left;
+}
+
+.summary-table td:last-child {
+	text-align: left;
+	color: #555;
 }

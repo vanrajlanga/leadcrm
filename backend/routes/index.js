@@ -51,6 +51,8 @@ const {
 
 const { createPayment } = require("../controllers/square.controller");
 
+const { createInvoice } = require("../controllers/payment.controller");
+
 const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -74,7 +76,11 @@ router.post("/asign-new-agent", authenticate, assignNewAgent);
 router.post("/create-lead", authenticate, createLead);
 router.post("/get-leads", authenticate, getAllLeads);
 router.post("/get-lead", authenticate, getLeadById);
-router.post("/get-leads-history-by-trackingId", authenticate, getLeadByTrackingId);
+router.post(
+	"/get-leads-history-by-trackingId",
+	authenticate,
+	getLeadByTrackingId
+);
 router.post("/update-lead", authenticate, updateLead);
 router.post("/delete-lead", authenticate, deleteLead);
 
@@ -104,5 +110,8 @@ router.post("/paypal-capture-order", captureOrder);
 
 // Square Routes
 router.post("/square-create-payment", createPayment);
+
+// Invoice Routes
+router.post("/create-invoice", createInvoice);
 
 module.exports = router;

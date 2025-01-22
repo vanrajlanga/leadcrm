@@ -12,19 +12,27 @@ const PaymentHistory = sequelize.define(
 		},
 		lead_id: {
 			type: DataTypes.BIGINT,
-			allowNull: false,
+			allowNull: true,
 		},
-		transaction_id: {
+		quote_id: {
 			type: DataTypes.BIGINT,
-			allowNull: false,
+			allowNull: true,
+		},
+		invoice_id: {
+			type: DataTypes.STRING,
+			allowNull: true,
 		},
 		amount: {
 			type: DataTypes.DECIMAL(10, 2),
-			allowNull: false,
+			allowNull: true,
 		},
 		payment_date: {
 			type: DataTypes.DATE,
-			allowNull: false,
+			allowNull: true,
+		},
+		payment_method: {
+			type: DataTypes.STRING,
+			allowNull: true,
 		},
 	},
 	{

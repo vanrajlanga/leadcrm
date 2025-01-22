@@ -12,7 +12,6 @@ const Quote = require("./quote.model");
 const Sale = require("./sale.model");
 const Ticket = require("./ticket.model");
 const Notification = require("./notification.model");
-const PaymentGatewayTransaction = require("./paymentGatewayTransaction.model");
 const PaymentHistory = require("./paymentHistory.model");
 const Session = require("./session.model");
 const SystemAnalytics = require("./systemAnalytics.model");
@@ -153,7 +152,6 @@ module.exports = {
 	Sale,
 	Ticket,
 	Notification,
-	PaymentGatewayTransaction,
 	PaymentHistory,
 	Session,
 	SystemAnalytics,

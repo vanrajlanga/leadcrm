@@ -12,12 +12,7 @@ import { PaymentForm, CreditCard } from "react-square-web-payments-sdk";
 import { useParams } from "react-router-dom";
 import "./Payment.css";
 
-// Load Stripe
-const stripePromise = loadStripe(
-	"pk_test_51QiWfwGhoHV44LJXCKFxDubJBAO1yseyVTz4Lvu0flAYyBA9BEoy9Mv38ft2InhB2ndXEkXEpFUlBmguZ05z8r1000DtCkxtvx"
-);
-
-// API Base URL from environment variables
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const API_URL = import.meta.env.VITE_API_URL;
 
 const PaymentPage = () => {
@@ -28,21 +23,19 @@ const PaymentPage = () => {
 
 	useEffect(() => {
 		const fetchCheckoutDetails = async () => {
-			if (payment_token) {
-				try {
-					const response = await axios.post(`${API_URL}/get-payment-amount`, {
-						payment_token,
-					});
-					setCheckoutDetails(response.data);
-				} catch (error) {
-					console.error("Error fetching checkout details:", error);
-					setMessage("Failed to fetch checkout details.");
-				}
-			} else {
-				setMessage("Payment token is missing.");
+			try {
+				const response = await axios.post(`${API_URL}/get-payment-amount`, {
+					payment_token,
+				});
+				setCheckoutDetails(response.data);
+			} catch (error) {
+				console.error("Error fetching checkout details:", error);
+				setMessage("Failed to fetch checkout details.");
 			}
 		};
-		fetchCheckoutDetails();
+
+		if (payment_token) fetchCheckoutDetails();
+		else setMessage("Payment token is missing.");
 	}, [payment_token]);
 
 	if (!checkoutDetails) {
@@ -50,6 +43,8 @@ const PaymentPage = () => {
 	}
 
 	const {
+		id,
+		lead_id,
 		product_name,
 		quote_details,
 		product_price,
@@ -59,7 +54,16 @@ const PaymentPage = () => {
 		selling_price,
 	} = checkoutDetails;
 
-	// Stripe Payment Component
+	const generateInvoice = async () => {
+		const response = await axios.post(`${API_URL}/create-invoice`, {
+			leadId: lead_id,
+			quoteId: id,
+			amount: selling_price,
+			paymentDate: new Date().toISOString(),
+			paymentMethod: paymentMethod,
+		});
+	};
+
 	const StripePayment = () => {
 		const stripe = useStripe();
 		const elements = useElements();
@@ -70,24 +74,22 @@ const PaymentPage = () => {
 			if (!stripe || !elements) return;
 
 			const card = elements.getElement(CardElement);
+			setLoading(true);
 
 			try {
-				setLoading(true);
-
 				const response = await axios.post(
 					`${API_URL}/create-stripe-payment-intent`,
 					{ amount: selling_price }
 				);
 
 				const clientSecret = response.data.clientSecret;
-
 				const { error } = await stripe.confirmCardPayment(clientSecret, {
 					payment_method: { card },
 				});
 
 				if (error) throw error;
-
 				setMessage("Stripe Payment Successful!");
+				generateInvoice();
 			} catch (err) {
 				console.error(err);
 				setMessage("Stripe Payment Failed!");
@@ -98,7 +100,26 @@ const PaymentPage = () => {
 
 		return (
 			<form onSubmit={handleStripePayment} className="payment-form">
-				<CardElement className="card-element" />
+				<CardElement
+					options={{
+						hidePostalCode: true, // Hides the ZIP/postal code field
+						style: {
+							base: {
+								fontSize: "16px",
+								color: "#32325d",
+								fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
+								"::placeholder": {
+									color: "#aab7c4",
+								},
+							},
+							invalid: {
+								color: "#fa755a",
+								iconColor: "#fa755a",
+							},
+						},
+					}}
+					className="card-element"
+				/>
 				<button
 					type="submit"
 					disabled={!stripe || loading}
@@ -110,7 +131,6 @@ const PaymentPage = () => {
 		);
 	};
 
-	// PayPal Payment Component
 	const PayPalPayment = () => {
 		const createOrder = async () => {
 			try {
@@ -119,7 +139,7 @@ const PaymentPage = () => {
 				});
 				return response.data.id;
 			} catch (err) {
-				console.error("Error creating PayPal order:", err);
+				console.error(err);
 				setMessage("Failed to create PayPal order.");
 				return null;
 			}
@@ -127,42 +147,36 @@ const PaymentPage = () => {
 
 		const onApprove = async (data) => {
 			try {
-				const response = await axios.post(`${API_URL}/paypal-capture-order`, {
+				await axios.post(`${API_URL}/paypal-capture-order`, {
 					orderID: data.orderID,
 				});
 				setMessage("PayPal Payment Successful!");
+				generateInvoice();
 			} catch (err) {
-				console.error("Error capturing PayPal order:", err);
+				console.error(err);
 				setMessage("Failed to capture PayPal payment.");
 			}
 		};
 
 		return (
 			<PayPalScriptProvider
-				options={{
-					"client-id":
-						"AZwg2Xa4qMqXRKQSMxkROq-UTqy-Bw8olq59DVQ12SCjBHTdthvgWTC5maSNJTDZ0-We8CS_hQtRxgyw",
-				}}
+				options={{ "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID }}
 			>
 				<PayPalButtons
 					style={{ layout: "vertical" }}
 					createOrder={createOrder}
 					onApprove={onApprove}
-					onError={(err) => {
-						console.error("PayPal Error:", err);
-						setMessage("PayPal Payment Failed!");
-					}}
+					onError={() => setMessage("PayPal Payment Failed!")}
 				/>
 			</PayPalScriptProvider>
 		);
 	};
 
-	// Square Payment Component
 	const SquarePayment = () => {
 		return (
 			<PaymentForm
-				applicationId="sandbox-sq0idb-V8zH7qs0V4r1urwSsoqeCg"
-				locationId="LTDR108RDSD0Y"
+				applicationId={import.meta.env.VITE_SQUARE_APPLICATION_ID}
+				locationId={import.meta.env.VITE_SQUARE_LOCATIONID}
 				cardTokenizeResponseReceived={async (token) => {
 					try {
 						const response = await axios.post(
@@ -175,6 +189,7 @@ const PaymentPage = () => {
 
 						if (response.data.success) {
 							setMessage("Square Payment Successful!");
+							generateInvoice();
 						} else {
 							setMessage("Square Payment Failed!");
 						}
@@ -186,10 +201,7 @@ const PaymentPage = () => {
 				createPaymentRequest={() => ({
 					countryCode: "US",
 					currencyCode: "USD",
-					total: {
-						amount: selling_price,
-						label: "Total",
-					},
+					total: { amount: selling_price, label: "Total" },
 				})}
 			>
 				<CreditCard />
@@ -211,32 +223,56 @@ const PaymentPage = () => {
 
 			<div className="checkout-summary">
 				<h3>Order Summary</h3>
-				<p>
-					<strong>Product:</strong> {product_name}
-				</p>
-				<p>
-					<strong>Details:</strong> {quote_details}
-				</p>
-				<p>
-					<strong>Price:</strong> ${product_price}
-				</p>
-				<p>
-					<strong>Discount:</strong> -${discount}
-				</p>
-				<p>
-					<strong>Tax:</strong> +${tax}
-				</p>
-				<p>
-					<strong>Shipping:</strong> +${shipping}
-				</p>
-				<hr />
-				<p className="total-price">
-					<strong>Total:</strong> ${selling_price}
-				</p>
+				<table className="summary-table">
+					<tbody>
+						<tr>
+							<td>
+								<strong>Product:</strong>
+							</td>
+							<td>{product_name}</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Details:</strong>
+							</td>
+							<td>{quote_details}</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Price:</strong>
+							</td>
+							<td>${product_price}</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Discount:</strong>
+							</td>
+							<td>-${discount}</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Tax:</strong>
+							</td>
+							<td>+${tax}</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Shipping:</strong>
+							</td>
+							<td>+${shipping}</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Total:</strong>
+							</td>
+							<td>${selling_price}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 
 			<div className="payment-methods">
-				<label className="payment-option">
+				<label>
 					<input
 						type="radio"
 						name="paymentMethod"
@@ -246,7 +282,7 @@ const PaymentPage = () => {
 					/>
 					Stripe
 				</label>
-				<label className="payment-option">
+				<label>
 					<input
 						type="radio"
 						name="paymentMethod"
@@ -256,7 +292,7 @@ const PaymentPage = () => {
 					/>
 					PayPal
 				</label>
-				<label className="payment-option">
+				<label>
 					<input
 						type="radio"
 						name="paymentMethod"
@@ -274,9 +310,7 @@ const PaymentPage = () => {
 						<StripePayment />
 					</Elements>
 				)}
-
 				{paymentMethod === "paypal" && <PayPalPayment />}
-
 				{paymentMethod === "square" && <SquarePayment />}
 			</div>
 

@@ -103,7 +103,6 @@ const AgentForm = ({
 									Phone no
 								</label>
 								<div className="input-group">
-									<span className="input-group-text">+91</span>
 									<input
 										type="tel"
 										className="form-control"
@@ -390,6 +389,18 @@ const AgentForm = ({
 											</option>
 										))}
 								</select>
+							</div>
+							<div className="col-md-4">
+								<label htmlFor="agent_extension" className="form-label">
+									Agent Extension Number
+								</label>
+								<input
+									type="tel"
+									className="form-control"
+									id="agent_extension"
+									value={formData.agent_extension || ""}
+									onChange={handleInputChange}
+								/>
 							</div>
 						</div>
 					</div>

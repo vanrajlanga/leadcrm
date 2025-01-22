@@ -18,21 +18,26 @@ const createQuotation = async (req, res) => {
 		const token =
 			"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5Nzk2LCJpc3MiOiJodHRwczpcL1wvc2VydmljZS5hY2Vmb25lLmNvLnVrXC90b2tlblwvZ2VuZXJhdGUiLCJpYXQiOjE3MzcxMTkxMDEsImV4cCI6MjAzNzExOTEwMSwibmJmIjoxNzM3MTE5MTAxLCJqdGkiOiJBOGgwbWw0VU5vN3dCUnpEIn0.8n-b7apGIM_t7ZTbTSouRiafEAx26QdyK1nIN4qOkzo";
 
-		await axios.post(
-			"https://api.acefone.co.uk/v1/sms/send",
-			{
-				message: "This is test message",
-				from_number: "27233",
-				to_number: req.body.to_number,
-				reference: generateRandomString(16),
-			},
-			{
-				headers: {
-					Authorization: `bearer ${token}`,
-					"Content-Type": "application/json",
+		try {
+			await axios.post(
+				"https://api.acefone.co.uk/v1/sms/send",
+				{
+					message: "This is test message",
+					from_number: "27233",
+					to_number: req.body.to_number,
+					reference: generateRandomString(16),
 				},
-			}
-		);
+				{
+					headers: {
+						Authorization: `bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+		} catch (smsError) {
+			console.error("Failed to send SMS:", smsError);
+			req.body.sms_status = "Failed to send SMS";
+		}
 
 		const transporter = nodemailer.createTransport({
 			host: "smtp-relay.brevo.com",

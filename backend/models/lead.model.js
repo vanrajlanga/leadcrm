@@ -70,13 +70,22 @@ const Lead = sequelize.define(
 		},
 		status: {
 			type: DataTypes.ENUM(
-				"Pending",
+				"New",
+				"Inprogress",
 				"Follow Up",
+				"Quotation Sent",
 				"Converted",
+				"Delivered",
 				"Rejected",
-				"Forwarded"
+				"Forwarded",
+				"Cancelled",
+				"Triage"
 			),
-			defaultValue: "Pending",
+			defaultValue: "New",
+		},
+		agent_extension: {
+			type: DataTypes.BIGINT,
+			allowNull: true,
 		},
 	},
 	{
