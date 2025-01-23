@@ -1,7 +1,8 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const axios = require("axios");
-const { CallLog, Quote } = require("../models");
+const { CallLog, Quote, Lead } = require("../models");
 const { Op } = require("sequelize");
+const multer = require("multer");
 
 // Acefone Token Variables
 let acefoneToken = null;
@@ -203,8 +204,77 @@ const getPaymentAmount = async (req, res) => {
 	}
 };
 
+const authDocumentUpload = async (req, res) => {
+	// Configure multer inline
+	const upload = multer({ storage: multer.memoryStorage() }).single(
+		"documentFile"
+	);
+
+	upload(req, res, async (err) => {
+		if (err) {
+			console.error("Multer Error:", err);
+			return res.status(400).json({
+				success: false,
+				message: "File upload failed",
+			});
+		}
+
+		const { lead_id, auth_document_type } = req.body;
+		const documentFile = req.file; // File uploaded via multer
+
+		if (!lead_id || !documentFile) {
+			return res.status(400).json({
+				success: false,
+				message: "Missing required fields: lead_id, document",
+			});
+		}
+
+		try {
+			// Prepare the S3 upload command
+			const fileName = `AuthDocuments/${lead_id}_${Date.now()}_${
+				documentFile.originalname
+			}`;
+			const uploadParams = {
+				Bucket: process.env.AWS_BUCKET_NAME,
+				Key: fileName,
+				Body: documentFile.buffer,
+				ContentType: documentFile.mimetype,
+			};
+
+			// Upload to S3
+			const data = await s3Client.send(new PutObjectCommand(uploadParams));
+			if (data.$metadata.httpStatusCode !== 200) {
+				throw new Error("Failed to upload file to S3");
+			}
+
+			// Update Lead with S3 URL
+			await Lead.update(
+				{
+					auth_document_url: `s3://${process.env.AWS_BUCKET_NAME}/${fileName}`,
+					auth_document_type: auth_document_type,
+				},
+				{
+					where: { id: lead_id },
+				}
+			);
+
+			res.status(200).json({
+				success: true,
+				message: "Document uploaded and URL updated successfully",
+			});
+		} catch (error) {
+			console.error("Error uploading document:", error.message);
+			res.status(500).json({
+				success: false,
+				message: "Failed to upload document",
+			});
+		}
+	});
+};
+
 module.exports = {
 	initiateCall,
 	fetchCallRecordings,
 	getPaymentAmount,
+	authDocumentUpload,
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -18,8 +19,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 const PaymentPage = () => {
 	const [paymentMethod, setPaymentMethod] = useState("stripe");
 	const [checkoutDetails, setCheckoutDetails] = useState(null);
-	const [message, setMessage] = useState("");
 	const { payment_token } = useParams();
+	const [paymentResponse, setPaymentResponse] = useState(null);
+	const [step, setStep] = useState(1); // Step tracker
+	const [documentName, setDocumentName] = useState("");
+	const [documentFile, setDocumentFile] = useState(null);
 
 	useEffect(() => {
 		const fetchCheckoutDetails = async () => {
@@ -30,12 +34,12 @@ const PaymentPage = () => {
 				setCheckoutDetails(response.data);
 			} catch (error) {
 				console.error("Error fetching checkout details:", error);
-				setMessage("Failed to fetch checkout details.");
+				toast.error("Failed to fetch checkout details.");
 			}
 		};
 
 		if (payment_token) fetchCheckoutDetails();
-		else setMessage("Payment token is missing.");
+		else toast.error("Payment token is missing.");
 	}, [payment_token]);
 
 	if (!checkoutDetails) {
@@ -54,13 +58,35 @@ const PaymentPage = () => {
 		selling_price,
 	} = checkoutDetails;
 
+	const handleDocumentUpload = async (e) => {
+		e.preventDefault();
+		const formData = new FormData();
+		formData.append("auth_document_type", documentName);
+		formData.append("documentFile", documentFile);
+		formData.append("payment_token", payment_token);
+		formData.append("lead_id", lead_id);
+
+		try {
+			await axios.post(`${API_URL}/auth-document-upload`, formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+			toast.success("Document uploaded successfully!");
+			setStep(2); // Move to step 2
+		} catch (error) {
+			console.error("Error uploading document:", error);
+			toast.error("Failed to upload document.");
+		}
+	};
+
 	const generateInvoice = async () => {
-		const response = await axios.post(`${API_URL}/create-invoice`, {
+		console.log("Generating invoice...", paymentResponse);
+		await axios.post(`${API_URL}/create-invoice`, {
 			leadId: lead_id,
 			quoteId: id,
 			amount: selling_price,
 			paymentDate: new Date().toISOString(),
 			paymentMethod: paymentMethod,
+			paymentResponse: paymentResponse,
 		});
 	};
 
@@ -83,16 +109,23 @@ const PaymentPage = () => {
 				);
 
 				const clientSecret = response.data.clientSecret;
-				const { error } = await stripe.confirmCardPayment(clientSecret, {
-					payment_method: { card },
-				});
+				const { error, paymentIntent } = await stripe.confirmCardPayment(
+					clientSecret,
+					{
+						payment_method: { card },
+					}
+				);
+				console.log("Payment Intent:", paymentIntent);
+				if (paymentIntent.status === "succeeded") {
+					setPaymentResponse(paymentIntent);
+				}
 
 				if (error) throw error;
-				setMessage("Stripe Payment Successful!");
-				generateInvoice();
+				toast.success("Stripe Payment Successful!");
+				await generateInvoice();
 			} catch (err) {
 				console.error(err);
-				setMessage("Stripe Payment Failed!");
+				toast.error("Stripe Payment Failed!");
 			} finally {
 				setLoading(false);
 			}
@@ -102,7 +135,7 @@ const PaymentPage = () => {
 			<form onSubmit={handleStripePayment} className="payment-form">
 				<CardElement
 					options={{
-						hidePostalCode: true, // Hides the ZIP/postal code field
+						hidePostalCode: true,
 						style: {
 							base: {
 								fontSize: "16px",
@@ -140,7 +173,7 @@ const PaymentPage = () => {
 				return response.data.id;
 			} catch (err) {
 				console.error(err);
-				setMessage("Failed to create PayPal order.");
+				toast.error("Failed to create PayPal order.");
 				return null;
 			}
 		};
@@ -150,11 +183,11 @@ const PaymentPage = () => {
 				await axios.post(`${API_URL}/paypal-capture-order`, {
 					orderID: data.orderID,
 				});
-				setMessage("PayPal Payment Successful!");
+				toast.success("PayPal Payment Successful!");
 				generateInvoice();
 			} catch (err) {
 				console.error(err);
-				setMessage("Failed to capture PayPal payment.");
+				toast.error("Failed to capture PayPal payment.");
 			}
 		};
 
@@ -166,7 +199,7 @@ const PaymentPage = () => {
 					style={{ layout: "vertical" }}
 					createOrder={createOrder}
 					onApprove={onApprove}
-					onError={() => setMessage("PayPal Payment Failed!")}
+					onError={() => toast.error("PayPal Payment Failed!")}
 				/>
 			</PayPalScriptProvider>
 		);
@@ -188,14 +221,14 @@ const PaymentPage = () => {
 						);
 
 						if (response.data.success) {
-							setMessage("Square Payment Successful!");
+							toast.success("Square Payment Successful!");
 							generateInvoice();
 						} else {
-							setMessage("Square Payment Failed!");
+							toast.error("Square Payment Failed!");
 						}
 					} catch (error) {
 						console.error("Square Payment Error:", error);
-						setMessage("Square Payment Failed!");
+						toast.error("Square Payment Failed!");
 					}
 				}}
 				createPaymentRequest={() => ({
@@ -211,116 +244,146 @@ const PaymentPage = () => {
 
 	return (
 		<div className="payment-container">
-			<div className="payment-header">
-				<img
-					src="https://www.autopartsvroom.com/logo/AUTO%20PARTS%20VROOM%20final.png"
-					alt="Company Logo"
-					className="company-logo"
-				/>
-			</div>
+			{step === 1 ? (
+				<div className="upload-step">
+					<h2 className="payment-title">Upload Authentication Document</h2>
+					<form onSubmit={handleDocumentUpload} className="upload-form">
+						<label>
+							Document Name:
+							<input
+								type="text"
+								value={documentName}
+								onChange={(e) => setDocumentName(e.target.value)}
+								required
+							/>
+						</label>
+						<label>
+							Upload Document (PDF, JPG, JPEG, PNG):
+							<input
+								type="file"
+								accept=".pdf,.jpg,.jpeg,.png"
+								onChange={(e) => setDocumentFile(e.target.files[0])}
+								required
+							/>
+						</label>
+						<div className="upload-actions">
+							<button type="submit" className="payment-button">
+								Upload
+							</button>
+							<button
+								type="button"
+								onClick={() => setStep(2)}
+								className="payment-button"
+							>
+								Skip
+							</button>
+						</div>
+					</form>
+				</div>
+			) : (
+				<div className="payment-step">
+					<div className="payment-header">
+						<img
+							src="https://www.autopartsvroom.com/logo/AUTO%20PARTS%20VROOM%20final.png"
+							alt="Company Logo"
+							className="company-logo"
+						/>
+					</div>
 
-			<h2 className="payment-title">Checkout</h2>
+					<h2 className="payment-title">Checkout</h2>
 
-			<div className="checkout-summary">
-				<h3>Order Summary</h3>
-				<table className="summary-table">
-					<tbody>
-						<tr>
-							<td>
-								<strong>Product:</strong>
-							</td>
-							<td>{product_name}</td>
-						</tr>
-						<tr>
-							<td>
-								<strong>Details:</strong>
-							</td>
-							<td>{quote_details}</td>
-						</tr>
-						<tr>
-							<td>
-								<strong>Price:</strong>
-							</td>
-							<td>${product_price}</td>
-						</tr>
-						<tr>
-							<td>
-								<strong>Discount:</strong>
-							</td>
-							<td>-${discount}</td>
-						</tr>
-						<tr>
-							<td>
-								<strong>Tax:</strong>
-							</td>
-							<td>+${tax}</td>
-						</tr>
-						<tr>
-							<td>
-								<strong>Shipping:</strong>
-							</td>
-							<td>+${shipping}</td>
-						</tr>
-						<tr>
-							<td>
-								<strong>Total:</strong>
-							</td>
-							<td>${selling_price}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+					<div className="checkout-summary">
+						<h3>Order Summary</h3>
+						<table className="summary-table">
+							<tbody>
+								<tr>
+									<td>
+										<strong>Product:</strong>
+									</td>
+									<td>{product_name}</td>
+								</tr>
+								<tr>
+									<td>
+										<strong>Details:</strong>
+									</td>
+									<td>{quote_details}</td>
+								</tr>
+								<tr>
+									<td>
+										<strong>Price:</strong>
+									</td>
+									<td>${product_price}</td>
+								</tr>
+								<tr>
+									<td>
+										<strong>Discount:</strong>
+									</td>
+									<td>-${discount}</td>
+								</tr>
+								<tr>
+									<td>
+										<strong>Tax:</strong>
+									</td>
+									<td>+${tax}</td>
+								</tr>
+								<tr>
+									<td>
+										<strong>Shipping:</strong>
+									</td>
+									<td>+${shipping}</td>
+								</tr>
+								<tr>
+									<td>
+										<strong>Total:</strong>
+									</td>
+									<td>${selling_price}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 
-			<div className="payment-methods">
-				<label>
-					<input
-						type="radio"
-						name="paymentMethod"
-						value="stripe"
-						checked={paymentMethod === "stripe"}
-						onChange={(e) => setPaymentMethod(e.target.value)}
-					/>
-					Stripe
-				</label>
-				<label>
-					<input
-						type="radio"
-						name="paymentMethod"
-						value="paypal"
-						checked={paymentMethod === "paypal"}
-						onChange={(e) => setPaymentMethod(e.target.value)}
-					/>
-					PayPal
-				</label>
-				<label>
-					<input
-						type="radio"
-						name="paymentMethod"
-						value="square"
-						checked={paymentMethod === "square"}
-						onChange={(e) => setPaymentMethod(e.target.value)}
-					/>
-					Square
-				</label>
-			</div>
+					<div className="payment-methods">
+						<label>
+							<input
+								type="radio"
+								name="paymentMethod"
+								value="stripe"
+								checked={paymentMethod === "stripe"}
+								onChange={(e) => setPaymentMethod(e.target.value)}
+							/>
+							Stripe
+						</label>
+						<label>
+							<input
+								type="radio"
+								name="paymentMethod"
+								value="paypal"
+								checked={paymentMethod === "paypal"}
+								onChange={(e) => setPaymentMethod(e.target.value)}
+							/>
+							PayPal
+						</label>
+						<label>
+							<input
+								type="radio"
+								name="paymentMethod"
+								value="square"
+								checked={paymentMethod === "square"}
+								onChange={(e) => setPaymentMethod(e.target.value)}
+							/>
+							Square
+						</label>
+					</div>
 
-			<div className="payment-content">
-				{paymentMethod === "stripe" && (
-					<Elements stripe={stripePromise}>
-						<StripePayment />
-					</Elements>
-				)}
-				{paymentMethod === "paypal" && <PayPalPayment />}
-				{paymentMethod === "square" && <SquarePayment />}
-			</div>
-
-			{message && (
-				<div
-					className={`payment-message ${
-						message.includes("Successful") ? "success" : "error"
-					}`}
-				>
-					{message}
+					<div className="payment-content">
+						{paymentMethod === "stripe" && (
+							<Elements stripe={stripePromise}>
+								<StripePayment />
+							</Elements>
+						)}
+						{paymentMethod === "paypal" && <PayPalPayment />}
+						{paymentMethod === "square" && <SquarePayment />}
+					</div>
 				</div>
 			)}
 		</div>

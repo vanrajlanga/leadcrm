@@ -34,9 +34,14 @@ const PaymentHistory = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: true,
 		},
+		json_response: {
+			type: DataTypes.JSON,
+			allowNull: true,
+		},
 	},
 	{
-		timestamps: false, // No createdAt or updatedAt for this table
+		timestamps: true,
+		createdAt: "createdAt",
 	}
 );
 
@@ -56,18 +61,6 @@ const manageIndexes = async () => {
 			console.log("Index lead_id_index added for PaymentHistories.");
 		} else {
 			console.log("Index lead_id_index already exists for PaymentHistories.");
-		}
-
-		// Check and add index for `transaction_id`
-		if (!indexes.some((index) => index.name === "transaction_id_index")) {
-			await queryInterface.addIndex("PaymentHistories", ["transaction_id"], {
-				name: "transaction_id_index",
-			});
-			console.log("Index transaction_id_index added for PaymentHistories.");
-		} else {
-			console.log(
-				"Index transaction_id_index already exists for PaymentHistories."
-			);
 		}
 
 		// Check and add index for `payment_date`

@@ -126,8 +126,14 @@ const generatePDF = async (html, filePath) => {
 // Create invoice and send email
 const createInvoice = async (req, res) => {
 	try {
-		const { lead_id, quote_id, amount, payment_date, payment_method, user } =
-			req.body;
+		const {
+			lead_id,
+			quote_id,
+			amount,
+			payment_date,
+			payment_method,
+			payment_response,
+		} = req.body;
 
 		const generateInvoiceId = async () => {
 			const lastPayment = await PaymentHistory.findOne({
@@ -153,6 +159,7 @@ const createInvoice = async (req, res) => {
 			amount,
 			payment_date,
 			payment_method,
+			payment_response,
 		});
 		const savedPaymentHistory = await newPaymentHistory.save();
 

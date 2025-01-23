@@ -91,6 +91,14 @@ const Lead = sequelize.define(
 			type: DataTypes.BIGINT,
 			allowNull: true,
 		},
+		auth_document_url: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		auth_document_type: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
 	},
 	{
 		timestamps: true,

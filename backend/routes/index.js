@@ -44,6 +44,7 @@ const {
 	initiateCall,
 	fetchCallRecordings,
 	getPaymentAmount,
+	authDocumentUpload,
 } = require("../controllers/master.controller");
 
 const {
@@ -125,5 +126,7 @@ router.post("/square-create-payment", createPayment);
 
 // Invoice Routes
 router.post("/create-invoice", createInvoice);
+
+router.post("/auth-document-upload", authDocumentUpload);
 
 module.exports = router;

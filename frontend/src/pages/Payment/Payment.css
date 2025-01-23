@@ -33,7 +33,7 @@
 .payment-title {
 	text-align: center;
 	margin: 20px 0;
-	color: #007bff;
+	color: #000;
 	font-size: 28px;
 	font-weight: 700;
 }
@@ -167,4 +167,55 @@
 .summary-table td:last-child {
 	text-align: left;
 	color: #555;
+}
+.upload-step {
+	padding: 20px;
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.upload-step label {
+	display: block;
+	margin: 15px 0;
+	font-size: 16px;
+	color: #333;
+	text-align: left;
+}
+
+.upload-step input[type="text"],
+.upload-step input[type="file"] {
+	width: 100%;
+	padding: 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	margin-top: 5px;
+	box-sizing: border-box;
+}
+
+.upload-actions {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+}
+
+.payment-button {
+	width: 48%;
+	padding: 14px;
+	background-color: #000;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.payment-button:hover {
+	background-color: #333;
+	transform: translateY(-2px);
 }
