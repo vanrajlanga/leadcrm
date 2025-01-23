@@ -7,6 +7,7 @@ import AddQuotation from "../../components/Quotation/addQuotation";
 import NewAgent from "../../components/Quotation/NewAgent";
 import axios from "axios";
 import { PiUserSwitchBold } from "react-icons/pi";
+import { toast } from "react-toastify";
 
 const LeadsList = ({
 	leads,
@@ -39,6 +40,10 @@ const LeadsList = ({
 	};
 
 	const openQuotationModal = (lead) => {
+		if (lead.cost_price === null || lead.cost_price === "") {
+			toast.error("Please add cost price first.");
+			return;
+		}
 		setSelectedLead(lead);
 		setOpenModal(true);
 	};
@@ -141,12 +146,26 @@ const LeadsList = ({
 	// Utility function to get color based on status
 	const getStatusColor = (status) => {
 		switch (status) {
+			case "New":
+				return "#007bff"; // Blue for new (represents a fresh start)
+			case "Inprogress":
+				return "#ffc107"; // Amber for in-progress (denotes activity)
 			case "Follow Up":
-				return "#333"; // Dark gray for follow up
+				return "#333"; // Dark gray for follow-up (already defined)
+			case "Quotation Sent":
+				return "#17a2b8"; // Teal for quotation sent (stands out but isn't final)
 			case "Converted":
-				return "#3EBA00"; // Dark green for converted
+				return "#3EBA00"; // Dark green for converted (already defined)
+			case "Delivered":
+				return "#28a745"; // Green for delivered (successful completion)
 			case "Rejected":
-				return "#D90000"; // Dark red for rejected
+				return "#D90000"; // Dark red for rejected (already defined)
+			case "Forwarded":
+				return "#6610f2"; // Purple for forwarded (represents movement)
+			case "Cancelled":
+				return "#6c757d"; // Gray for cancelled (neutral, inactive status)
+			case "Triage":
+				return "#fd7e14"; // Orange for triage (urgent or prioritization phase)
 			default:
 				return "black"; // Default color if none of the statuses match
 		}

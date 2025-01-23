@@ -15,6 +15,12 @@ const createQuotation = async (req, res) => {
 			...req.body,
 		});
 
+		const lead = await Lead.findByPk(req.body.lead_id);
+		if (lead) {
+			lead.selling_price = req.body.selling_price;
+			lead.status = "InProgress";
+			await lead.save();
+		}
 		const token =
 			"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5Nzk2LCJpc3MiOiJodHRwczpcL1wvc2VydmljZS5hY2Vmb25lLmNvLnVrXC90b2tlblwvZ2VuZXJhdGUiLCJpYXQiOjE3MzcxMTkxMDEsImV4cCI6MjAzNzExOTEwMSwibmJmIjoxNzM3MTE5MTAxLCJqdGkiOiJBOGgwbWw0VU5vN3dCUnpEIn0.8n-b7apGIM_t7ZTbTSouRiafEAx26QdyK1nIN4qOkzo";
 

@@ -71,7 +71,7 @@ const Lead = sequelize.define(
 		status: {
 			type: DataTypes.ENUM(
 				"New",
-				"Inprogress",
+				"InProgress",
 				"Follow Up",
 				"Quotation Sent",
 				"Converted",

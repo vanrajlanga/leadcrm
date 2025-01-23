@@ -63,3 +63,44 @@
 	border-radius: 4px;
 	cursor: pointer;
 }
+.status.new {
+	background-color: #e7f3ff; /* Light blue */
+	color: #007bff; /* Blue for contrast */
+	min-width: 100px;
+}
+
+.status.inprogress {
+	background-color: #fff7e6; /* Light amber */
+	color: #ffc107; /* Amber for activity */
+	min-width: 100px;
+}
+
+.status.quotation-sent {
+	background-color: #e0f7fa; /* Light teal */
+	color: #17a2b8; /* Teal for contrast */
+	min-width: 100px;
+}
+
+.status.delivered {
+	background-color: #e8fbe8; /* Light green */
+	color: #28a745; /* Green for visibility */
+	min-width: 100px;
+}
+
+.status.forwarded {
+	background-color: #ede9f9; /* Light purple */
+	color: #6610f2; /* Purple for movement */
+	min-width: 100px;
+}
+
+.status.cancelled {
+	background-color: #f8f9fa; /* Light gray */
+	color: #6c757d; /* Gray for neutrality */
+	min-width: 100px;
+}
+
+.status.triage {
+	background-color: #fff4e6; /* Light orange */
+	color: #fd7e14; /* Orange for urgency */
+	min-width: 100px;
+}
