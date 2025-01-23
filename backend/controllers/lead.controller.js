@@ -1,4 +1,4 @@
-const { Lead, Agent } = require("../models");
+const { Lead, Agent, Note, Ticket } = require("../models");
 const multer = require("multer");
 const moment = require("moment");
 const {
@@ -275,6 +275,138 @@ const deleteLead = async (req, res) => {
 	}
 };
 
+const rejectLead = async (req, res) => {
+	try {
+		const lead = await Lead.findByPk(req.body.lead_id);
+
+		if (!lead) {
+			return res.status(404).send({ error: "Lead not found" });
+		}
+
+		// Update the lead status to Rejected
+		await lead.update({ status: "Rejected" });
+
+		res.status(200).send({ message: "Lead rejected successfully" });
+	} catch (error) {
+		console.error("Error rejecting lead:", error);
+		res.status(500).send({ error: "Failed to reject lead" });
+	}
+};
+
+const addFollowup = async (req, res) => {
+	try {
+		const lead = await Lead.findByPk(req.body.lead_id);
+
+		if (!lead) {
+			return res.status(404).send({ error: "Lead not found" });
+		}
+
+		await lead.update({ followup_date: req.body.followupDate });
+
+		res.status(200).send({ message: "Follow-up added successfully" });
+	} catch (error) {
+		console.error("Error adding follow-up:", error);
+		res.status(500).send({ error: "Failed to add follow-up" });
+	}
+};
+
+const addShippingDetails = async (req, res) => {
+	try {
+		const lead = await Lead.findByPk(req.body.lead_id);
+
+		if (!lead) {
+			return res.status(404).send({ error: "Lead not found" });
+		}
+
+		await lead.update({
+			trackingLink: req.body.tracking_link,
+			status: "Shipped",
+		});
+
+		if( req.body.notes != null) {
+			await Note.create({
+				lead_id: req.body.lead_id,
+				content: req.body.notes,
+			});
+		}
+
+		res.status(200).send({ message: "Shipping details added successfully" });
+	} catch (error) {
+		console.error("Error adding shipping details:", error);
+		res.status(500).send({ error: "Failed to add shipping details" });
+	}
+};
+
+const addTickets = async (req, res) => {
+	try {
+		const lead = await Lead.findByPk(req.body.lead_id);
+
+		if (!lead) {
+			return res.status(404).send({ error: "Lead not found" });
+		}
+
+		await Ticket.create({
+			lead_id: req.body.lead_id,
+			agent_id: req.body.agent_id,
+			status: "Open",
+			description: req.body.issue,
+			priority: "medium",
+		});
+
+		res.status(200).send({ message: "Tickets added successfully" });
+	} catch (error) {
+		console.error("Error adding tickets:", error);
+		res.status(500).send({ error: "Failed to add tickets" });
+	}
+};
+
+const getAllTickets = async (req, res) => {
+	try {
+		const tickets = await Ticket.findAll({
+			include: [
+				{
+					model: Agent,
+					as: "agent",
+					attributes: ["firstName", "lastName"],
+				},
+				{
+					model: Lead,
+					as: "lead",
+					attributes: ["name", "phone", "email", "parts"],
+				},
+			],
+			order: [["createdAt", "DESC"]],
+		});
+
+		const formattedTickets = tickets.map((ticket) => ({
+			...ticket.toJSON(),
+			agent: ticket.agent
+				? `${ticket.agent.firstName} ${ticket.agent.lastName}`
+				: null,
+		}));
+
+		res.status(200).send(formattedTickets);
+	} catch (error) {
+		console.error("Error getting tickets:", error);
+		res.status(500).send({ error: "Failed to get tickets" });
+	}
+};
+
+const getTicketDetails = async (req, res) => {
+	try {
+		const ticket = await Ticket.findByPk(req.body.ticketId);
+
+		if (!ticket) {
+			return res.status(404).send({ error: "Ticket not found" });
+		}
+
+		res.status(200).send(ticket.description);
+	} catch (error) {
+		console.error("Error getting ticket details:", error);
+		res.status(500).send({ error: "Failed to get ticket details" });
+	}
+};
+
 module.exports = {
 	createLead,
 	getAllLeads,
@@ -282,4 +414,10 @@ module.exports = {
 	getLeadByTrackingId,
 	updateLead,
 	deleteLead,
+	rejectLead,
+	addFollowup,
+	addShippingDetails,
+	addTickets,
+	getAllTickets,
+	getTicketDetails,
 };

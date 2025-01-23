@@ -16,8 +16,14 @@ const {
 	getAllLeads,
 	getLeadById,
 	getLeadByTrackingId,
+	rejectLead,
 	updateLead,
 	deleteLead,
+	addFollowup,
+	addShippingDetails,
+	addTickets,
+	getAllTickets,
+	getTicketDetails,
 } = require("../controllers/lead.controller");
 
 const {
@@ -83,6 +89,12 @@ router.post(
 );
 router.post("/update-lead", authenticate, updateLead);
 router.post("/delete-lead", authenticate, deleteLead);
+router.post("/reject-lead", authenticate, rejectLead);
+router.post("/add-followup", authenticate, addFollowup);
+router.post("/add-shipment", authenticate, addShippingDetails);
+router.post("/add-tickets", authenticate, addTickets);
+router.post("/get-tickets", authenticate, getAllTickets);
+router.post("/get-ticket-details", authenticate, getTicketDetails);
 
 // Vendor Routes
 router.post("/create-vendor", authenticate, createVendor);

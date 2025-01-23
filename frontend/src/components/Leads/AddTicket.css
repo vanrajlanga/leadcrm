@@ -1,0 +1,8 @@
+.form-group.c-id, .form-group.c-name, .form-group.product-category, .form-group.cp {
+    width: 30%;
+    margin-right: 3%;
+}
+
+.form-group.c-number, .form-group.sp {
+    width: 33%;
+}

@@ -39,6 +39,9 @@ const Lead = sequelize.define(
 		trackingId: {
 			type: DataTypes.STRING,
 		},
+		trackingLink: {
+			type: DataTypes.STRING,
+		},
 		recordAudio: {
 			type: DataTypes.STRING, // Stores the S3 URL of the uploaded audio file
 			allowNull: true,
@@ -79,7 +82,8 @@ const Lead = sequelize.define(
 				"Rejected",
 				"Forwarded",
 				"Cancelled",
-				"Triage"
+				"Triage",
+				"Shipped"
 			),
 			defaultValue: "New",
 		},

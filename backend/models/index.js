@@ -91,6 +91,18 @@ Lead.hasMany(Ticket, {
 	as: "tickets",
 	foreignKey: "lead_id",
 });
+Ticket.belongsTo(Agent, {
+	as: "agent",
+	foreignKey: {
+		name: "agent_id",
+		allowNull: false,
+		index: false,
+	},
+});
+Agent.hasMany(Ticket, {
+	as: "tickets",
+	foreignKey: "agent_id",
+});
 
 Lead.hasMany(Quote, {
 	as: "quote",

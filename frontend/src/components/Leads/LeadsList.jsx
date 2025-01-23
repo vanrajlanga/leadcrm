@@ -5,6 +5,9 @@ import { IoMdCalendar, IoIosMore } from "react-icons/io";
 import "./LeadsList.css";
 import AddQuotation from "../../components/Quotation/addQuotation";
 import NewAgent from "../../components/Quotation/NewAgent";
+import AddFollowup from "../../components/Leads/AddFollowup";
+import Shipment from "../../components/Leads/Shipment";
+import AddTicket from "../../components/Leads/AddTicket";
 import axios from "axios";
 import { PiUserSwitchBold } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -19,6 +22,9 @@ const LeadsList = ({
 	const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [newAgentModal, setNewAgentModal] = useState(false);
+	const [followupModal, setFollowupModal] = useState(false);
+	const [shipmentModal, setShipmentModal] = useState(false);
+	const [ticketModal, setTicketModal] = useState(false);
 	const [selectedLead, setSelectedLead] = useState(null);
 	const [newVendor, setNewVendor] = useState(false);
 	const [vendorData, setVendorData] = useState({
@@ -27,6 +33,11 @@ const LeadsList = ({
 		email: "",
 		address: "",
 	});
+	const [actions, setActions] = useState([
+		{ id: 1, name: "Reject" },
+		{ id: 2, name: "Shipped" },
+		{ id: 3, name: "Ticket Raised" },
+	]);
 	const [selectedVendorId, setSelectedVendorId] = useState(null);
 	const [costPrice, setCostPrice] = useState("");
 
@@ -51,6 +62,11 @@ const LeadsList = ({
 	const openNewAgentModal = (lead) => {
 		setSelectedLead(lead);
 		setNewAgentModal(true);
+	};
+
+	const openFollowupModal = (lead) => {
+		setSelectedLead(lead);
+		setFollowupModal(true);
 	};
 
 	// Close the vendor modal
@@ -176,6 +192,55 @@ const LeadsList = ({
 		return status?.toLowerCase().replace(/\s+/g, "-");
 	};
 
+	const [showActions, setShowActions] = useState(null);
+
+	const toggleActions = (leadId) => {
+		setShowActions(showActions === leadId ? null : leadId);
+	};
+
+	const performAction = async (action, lead) => {
+		if(action == "Reject"){
+			performReject(lead);
+		}else if(action == "Shipped"){
+			openShipmentModal(lead);
+		}else if(action == "Ticket Raised"){
+			openTicketModal(lead);
+		}
+	};
+
+	const openShipmentModal = (lead) => {
+		setSelectedLead(lead);
+		setShipmentModal(true);
+		setShowActions(null);
+	};
+
+	const openTicketModal = (lead) => {
+		setSelectedLead(lead);
+		setTicketModal(true);
+		setShowActions(null);
+	};
+
+	const performReject = async (lead) => {
+		try {
+			if (window.confirm("Are you sure you want to reject this lead?")) {
+				const response = await axios.post(
+					`${API_URL}/reject-lead`,
+					{ lead_id: lead.id },
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+				refreshLeads();
+		
+				toast.success("Lead rejected successfully!");
+			}
+			setShowActions(null);
+		} catch (error) {
+			console.error("Error rejecting lead:", error);
+			toast.error('Failed to reject lead');
+		}
+	};
+
 	return (
 		<div className="table-container" style={{ maxWidth: "calc(300px * 7)" }}>
 			<table className="custom-table">
@@ -243,15 +308,18 @@ const LeadsList = ({
 								</button>
 							</td>
 							<td>
+							{lead.status !== "Rejected" && lead.status !== "Forwarded" && (
+
 								<button
 									className="quotation-btn"
 									onClick={() => openQuotationModal(lead)}
 								>
 									Quotation
 								</button>
+							)}
 							</td>
-							<td>
-								{lead.status !== "Forwarded" && (
+							<td className="action-cell">
+								{lead.status !== "Forwarded" && lead.status !== "Rejected" && (
 									<button
 										className="action-btn"
 										onClick={() => openNewAgentModal(lead)}
@@ -259,9 +327,39 @@ const LeadsList = ({
 										<PiUserSwitchBold />
 									</button>
 								)}
-								<button className="action-btn">
-									<IoIosMore />
-								</button>
+								{lead.status !== "Forwarded" && lead.status !== "Rejected" && (
+									<button
+										className="action-btn"
+										onClick={() => openFollowupModal(lead)}
+									>
+										<IoMdCalendar />
+									</button>
+								)}
+								{lead.status !== "Rejected" && lead.status !== "Forwarded" && (
+									<button 
+										className="action-btn"
+										onClick={() => toggleActions(lead.id)}
+									>
+										<IoIosMore />
+									</button>
+								)}
+								{showActions === lead.id && (
+									<div className="actions-list">
+										{actions
+											.filter((action) =>
+												(action.name.toLowerCase() !== "reject" || lead.status !== "Rejected") && (action.name.toLowerCase() !== "reject" || lead.status !== "Forwarded")
+											)
+											.map((action) => (
+												<div
+													key={action.id}
+													className="agent-item"
+													onClick={() => performAction(action.name, lead)}
+												>
+													{action.name}
+												</div>
+											))}
+									</div>
+								)}
 							</td>
 						</tr>
 					))}
@@ -276,6 +374,30 @@ const LeadsList = ({
 			{newAgentModal && (
 				<NewAgent
 					closeModal={() => setNewAgentModal(false)}
+					lead={selectedLead}
+					refreshLeads={() => refreshLeads()}
+				/>
+			)}
+
+			{followupModal && (
+				<AddFollowup
+					closeModal={() => setFollowupModal(false)}
+					lead={selectedLead}
+					refreshLeads={() => refreshLeads()}
+				/>
+			)}
+
+			{shipmentModal && (
+				<Shipment
+					closeModal={() => setShipmentModal(false)}
+					lead={selectedLead}
+					refreshLeads={() => refreshLeads()}
+				/>
+			)}
+
+			{ticketModal && (
+				<AddTicket
+					closeModal={() => setTicketModal(false)}
 					lead={selectedLead}
 					refreshLeads={() => refreshLeads()}
 				/>

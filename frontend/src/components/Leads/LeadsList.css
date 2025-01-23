@@ -99,8 +99,25 @@
 	min-width: 100px;
 }
 
+.status.rejected {
+	background-color: #ffe8e8; /* Light red */
+	color: #dc3545; /* Red for visibility */
+	min-width: 100px;
+}
+
+.status.shipped {
+	background-color: #d4edda; /* Slightly darker green */
+	color: #155724; /* Darker green for contrast */
+	min-width: 100px;
+}
+
 .status.triage {
 	background-color: #fff4e6; /* Light orange */
 	color: #fd7e14; /* Orange for urgency */
 	min-width: 100px;
+}
+
+.actions-list {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
 }

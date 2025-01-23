@@ -16,10 +16,6 @@ const Ticket = sequelize.define(
 		agent_id: {
 			type: DataTypes.BIGINT,
 		},
-		subject: {
-			type: DataTypes.STRING,
-			allowNull: false,
-		},
 		description: {
 			type: DataTypes.TEXT,
 		},
